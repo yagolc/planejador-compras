@@ -1,0 +1,81 @@
+id,item,categoria,embalagem,qtd_embalagem,unidade_base,preco_embalagem_brl,preco_por_unidade_base_brl,tipo,fonte,referencia
+1,Arroz agulhinha tipo 1,Grãos e cereais,pacote 5 kg,5,kg,21.98,4.40,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+2,Feijão carioca,Grãos e cereais,pacote 1 kg,1,kg,8.27,8.27,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+3,Feijão preto,Grãos e cereais,pacote 1 kg,1,kg,8.50,8.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+4,Lentilha,Grãos e cereais,pacote 500 g,0.5,kg,8.90,17.80,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+5,Grão-de-bico,Grãos e cereais,pacote 500 g,0.5,kg,9.90,19.80,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+6,Aveia em flocos,Grãos e cereais,caixa 200 g,0.2,kg,5.50,27.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+7,Fubá,Grãos e cereais,pacote 1 kg,1,kg,4.90,4.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+8,Milho de pipoca,Grãos e cereais,pacote 500 g,0.5,kg,5.50,11.00,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+9,Farinha de trigo,Farinhas e massas,pacote 1 kg,1,kg,4.32,4.32,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+10,Farinha de mandioca torrada,Farinhas e massas,pacote 500 g,0.5,kg,7.45,14.90,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+11,Goma de tapioca,Farinhas e massas,pacote 500 g,0.5,kg,6.90,13.80,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+12,Macarrão com ovos,Farinhas e massas,pacote 500 g,0.5,kg,3.45,6.90,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+13,Pão francês,Padaria,granel,1,kg,18.07,18.07,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+14,Pão de forma,Padaria,pacote 500 g,0.5,kg,7.04,14.08,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+15,Biscoito maisena,Padaria,pacote 200 g,0.2,kg,3.67,18.35,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+16,Biscoito recheado,Padaria,pacote 140 g,0.14,kg,2.99,21.36,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+17,Biscoito água e sal,Padaria,pacote 200 g,0.2,kg,3.12,15.60,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+18,Açúcar refinado,Mercearia,pacote 5 kg,5,kg,17.78,3.56,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+19,Café em pó,Mercearia,pacote 500 g,0.5,kg,24.40,48.80,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+20,Óleo de soja,Mercearia,garrafa 900 ml,0.9,L,7.86,8.73,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+21,Azeite de oliva extravirgem,Mercearia,garrafa 500 ml,0.5,L,34.90,69.80,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+22,Extrato de tomate,Mercearia,lata/sachê 340 g,0.34,kg,4.95,14.56,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+23,Molho de tomate,Mercearia,sachê 300 g,0.3,kg,2.90,9.67,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+24,Sal refinado,Mercearia,pacote 1 kg,1,kg,3.20,3.20,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+25,Vinagre de álcool,Mercearia,garrafa 750 ml,0.75,L,3.50,4.67,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+26,Achocolatado em pó,Mercearia,pote 400 g,0.4,kg,9.90,24.75,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+27,Milho verde em conserva,Mercearia,lata 170 g,0.17,kg,4.50,26.47,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+28,Sardinha em lata,Mercearia,lata 125 g,0.125,kg,6.50,52.00,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+29,Atum em lata,Mercearia,lata 170 g,0.17,kg,9.90,58.24,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+30,Leite UHT integral,Laticínios e ovos,caixa 1 L,1,L,5.71,5.71,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+31,Leite em pó integral,Laticínios e ovos,lata/pacote 400 g,0.4,kg,17.71,44.27,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+32,Ovos brancos,Laticínios e ovos,dúzia,12,unidade,10.10,0.84,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+33,Margarina,Laticínios e ovos,pote 250 g,0.25,kg,3.97,15.88,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+34,Manteiga,Laticínios e ovos,pote 200 g,0.2,kg,12.90,64.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+35,Queijo muçarela fatiado,Laticínios e ovos,granel,1,kg,56.64,56.64,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+36,Queijo minas frescal,Laticínios e ovos,granel,1,kg,39.90,39.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+37,Requeijão cremoso,Laticínios e ovos,copo 200 g,0.2,kg,8.90,44.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+38,Iogurte natural,Laticínios e ovos,pote 170 g,0.17,kg,3.50,20.59,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+39,Presunto fatiado,Frios,granel,1,kg,33.01,33.01,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+40,Salsicha,Frios,granel,1,kg,13.15,13.15,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+41,Linguiça fresca,Carnes,granel,1,kg,24.36,24.36,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+42,"Carne bovina de primeira (ex: alcatra, patinho)",Carnes,granel,1,kg,53.16,53.16,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+43,"Carne bovina de segunda sem osso (ex: acém, músculo)",Carnes,granel,1,kg,35.08,35.08,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+44,Carne moída (patinho),Carnes,granel,1,kg,42.90,42.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+45,Carne suína (pernil),Carnes,granel,1,kg,24.90,24.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+46,Frango inteiro resfriado,Carnes,granel,1,kg,11.17,11.17,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+47,Peito de frango,Carnes,granel,1,kg,19.90,19.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+48,Coxa e sobrecoxa de frango,Carnes,granel,1,kg,13.90,13.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+49,Filé de tilápia,Peixes,congelado 1 kg,1,kg,49.90,49.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+50,Batata,Hortifruti - legumes,granel,1,kg,7.75,7.75,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+51,Cebola,Hortifruti - legumes,granel,1,kg,8.36,8.36,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+52,Alho,Hortifruti - legumes,granel,1,kg,30.95,30.95,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+53,Tomate,Hortifruti - legumes,granel,1,kg,9.50,9.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+54,Cenoura,Hortifruti - legumes,granel,1,kg,5.90,5.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+55,Abobrinha,Hortifruti - legumes,granel,1,kg,6.90,6.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+56,Chuchu,Hortifruti - legumes,granel,1,kg,4.50,4.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+57,Pimentão verde,Hortifruti - legumes,granel,1,kg,9.90,9.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+58,Mandioca,Hortifruti - legumes,granel,1,kg,5.50,5.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+59,Batata-doce,Hortifruti - legumes,granel,1,kg,5.90,5.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+60,Repolho,Hortifruti - verduras,granel,1,kg,4.50,4.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+61,Alface,Hortifruti - verduras,pé,1,unidade,3.50,3.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+62,Brócolis,Hortifruti - verduras,maço,1,unidade,6.90,6.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+63,Cheiro-verde,Hortifruti - verduras,maço,1,unidade,2.50,2.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+64,Banana prata,Hortifruti - frutas,granel,1,kg,6.50,6.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+65,Maçã,Hortifruti - frutas,granel,1,kg,10.90,10.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+66,Laranja pera,Hortifruti - frutas,granel,1,kg,4.50,4.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+67,Limão taiti,Hortifruti - frutas,granel,1,kg,5.50,5.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+68,Mamão formosa,Hortifruti - frutas,granel,1,kg,6.90,6.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+69,Abacate,Hortifruti - frutas,granel,1,kg,9.90,9.90,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+70,Melancia,Hortifruti - frutas,granel,1,kg,3.50,3.50,estimativa,"Estimativa Claude (nov/2026), validar",2026-11
+71,Sabão em pó,Limpeza,caixa 1 kg,1,kg,11.38,11.38,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+72,Sabão em barra,Limpeza,unidade,1,unidade,3.07,3.07,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+73,Água sanitária,Limpeza,frasco 1 L,1,L,3.82,3.82,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+74,Amaciante,Limpeza,frasco 2 L,2,L,8.74,4.37,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+75,Detergente líquido,Limpeza,frasco 500 ml,0.5,L,2.46,4.92,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+76,Limpador multiuso,Limpeza,frasco 500 ml,0.5,L,4.33,8.66,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+77,Papel higiênico,Higiene,pacote 4 rolos,4,unidade,7.35,1.84,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+78,Creme dental,Higiene,tubo 90 g,1,unidade,5.41,5.41,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+79,Sabonete,Higiene,unidade 90 g,1,unidade,2.06,2.06,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10
+80,Desodorante spray,Higiene,frasco 90-100 ml,1,unidade,11.39,11.39,pesquisado,Procon-SP/DIEESE cesta out/2026 (cidade de SP),2026-10

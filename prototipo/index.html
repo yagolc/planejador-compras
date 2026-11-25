@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17583a">
+<title>Cesta: planejador de compras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: amigável e direto, como um app de mercado bem feito.
+   IDEA: a sacola de feira: o orçamento é uma sacola que enche.
+   PICTURE: medidor do orçamento grande no topo do resultado; o próprio formulário no início.
+   COLOUR and TYPE: verde-feira profundo, branco, tomate como acento; Figtree.
+   LAYOUT: coluna única de app, navegação inferior fixa, cartões simples. */
+:root{color-scheme:light dark;
+ --bg:light-dark(#f6f4ee,#101412);--card:light-dark(#fff,#1a201d);--ink:light-dark(#18201b,#eef2ee);
+ --mute:light-dark(#5d6a62,#9fb0a6);--line:light-dark(#e3e0d6,#2a332e);
+ --g:#17583a;--gt:light-dark(#17583a,#7fd3a5);--g2:light-dark(#e3f0e8,#1f3a2c);--t:#d63c2f;--t2:light-dark(#fde9e6,#3a1f1b);--y:#f2b52b;--y2:light-dark(#fff4d6,#3a3218)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,sans-serif;overflow-x:clip;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+header{background:var(--g);color:#fff;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;display:flex;align-items:center;gap:12px}
+header b{font-size:20px;font-weight:800;display:block;line-height:1.1}header span{font-size:13px;opacity:.85}
+main{max-width:640px;margin:0 auto;padding:16px}
+h1{font-size:30px;line-height:1.08;margin:6px 0 14px;text-wrap:balance}
+h2{font-size:18px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:12px}
+label.l,.l{display:block;font-weight:600;margin-bottom:6px}.hint{color:var(--mute);font-size:14px;margin:4px 0 0}
+input[type=number],input[type=text],input[type=url]{font:inherit;font-size:16px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);min-height:48px}
+.money{display:flex;align-items:center;gap:8px}.money span{font-size:28px;font-weight:800;color:var(--gt)}
+.money input{font-size:28px;font-weight:800;padding:8px 12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.row>*{flex:1 1 140px}
+.step{display:flex;align-items:center;gap:8px}.step button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--g2);color:var(--ink);font-size:24px;font-weight:800;cursor:pointer}
+.step output{font-size:26px;font-weight:800;min-width:2ch;text-align:center}
+select{font:inherit;font-size:16px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);min-height:48px}
+input[type=range]{width:100%;accent-color:var(--g);height:44px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:9px 14px;min-height:42px;cursor:pointer}
+.chip.on{background:var(--g);border-color:var(--g);color:#fff}.chip.no.on{background:var(--t);border-color:var(--t)}
+.seg{display:flex;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.seg button{flex:1;font:inherit;border:0;border-radius:9px;padding:10px;background:none;color:var(--ink);cursor:pointer;min-height:44px}.seg button.on{background:var(--card);font-weight:700;box-shadow:0 1px 3px #0002}
+.sw{display:flex;align-items:flex-start;gap:10px;margin-top:12px}.sw input{width:22px;height:22px;accent-color:var(--g);flex:none;margin-top:1px}.sw b{display:block}
+.btn{font:inherit;font-weight:800;font-size:17px;border:0;border-radius:14px;padding:13px 18px;background:var(--t);color:#fff;width:100%;cursor:pointer;min-height:50px}
+.btn.alt{background:var(--g2);color:var(--ink)}.btn.sm{width:auto;font-size:15px;min-height:44px;padding:8px 14px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--y);outline-offset:2px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;font:inherit;font-size:13px;font-weight:600;border:0;background:none;color:var(--mute);padding:6px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:54px}
+nav button svg{width:24px;height:24px}nav button.on{color:var(--gt)}nav button:disabled{opacity:.35}
+.sum{background:var(--g);color:#fff;border:0}
+.sum .big{font-size:clamp(34px,10vw,46px);font-weight:800;line-height:1}.sum .of{opacity:.88}
+.meter{height:16px;border-radius:9px;background:#ffffff33;margin:14px 0 8px;overflow:hidden}.meter i{display:block;height:100%;background:var(--y);border-radius:9px;transition:width .6s}
+.meter.over i{background:#ff7a6e}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}.stats div{background:#ffffff1a;border-radius:12px;padding:8px 10px}.stats b{display:block;font-size:18px;white-space:nowrap}.stats small{font-size:13px;opacity:.88}
+.warn{background:var(--t2);border-color:transparent}.ok{background:var(--g2);border-color:transparent}.tip{background:var(--y2);border-color:transparent}
+.day h2{display:flex;justify-content:space-between}.day h2 small{color:var(--mute);font-weight:400;font-size:14px}
+.meal{display:flex;gap:12px;align-items:center;width:100%;text-align:left;font:inherit;color:inherit;background:none;border:0;border-top:1px solid var(--line);padding:10px 0;cursor:pointer;min-height:48px}
+.day h2+.meal{border-top:0}.meal .k{flex:0 0 64px;color:var(--mute);font-size:14px}.meal .n{flex:1;font-weight:600}.meal .tag{font-size:13px;color:var(--mute);font-weight:400}
+.cz{font-size:12px;padding:2px 8px;border-radius:999px;background:var(--g2);white-space:nowrap}
+.li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}.card h2+.li{border-top:0}
+.li input{width:24px;height:24px;margin-top:2px;accent-color:var(--g);flex:none}.li .d{flex:1}.li .d small{display:block;color:var(--mute);font-size:14px}
+.li .p{font-weight:700;white-space:nowrap}.li.done .d,.li.done .p{opacity:.45;text-decoration:line-through}
+.who{color:var(--gt);font-size:13px;text-decoration:none;display:block}
+.pr{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.card h2+.pr{border-top:0}.pr .d{flex:1;font-size:15px}.pr .d small{display:block;color:var(--mute);font-size:13px}
+.pr input{width:100px;flex:none;text-align:right;min-height:44px;padding:8px 10px}
+.src{font-size:12px;border-radius:6px;padding:1px 6px;background:var(--g2);white-space:nowrap}.src.e{background:var(--t2)}.src.n{background:var(--y2)}
+.swap{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.card h2+.swap{border-top:0}.swap p{margin:0;flex:1}.swap b.s{color:var(--gt);white-space:nowrap}
+.ov{position:fixed;inset:0;background:#0007;display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sheet{background:var(--card);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(24px + env(safe-area-inset-bottom))}
+.sheet ul{padding-left:20px}.x{float:right;font:inherit;font-size:22px;border:0;background:var(--g2);color:var(--ink);border-radius:50%;width:44px;height:44px;cursor:pointer}
+.add{display:flex;gap:8px;margin-top:10px}.add input{flex:1 1 0;width:auto}.add .btn{flex:none;width:auto;padding:0 14px;font-size:15px}
+.pan{display:flex;gap:8px;align-items:center;padding:6px 0}.pan span{flex:1}.pan input{width:110px;flex:none;text-align:right}.pan button{flex:none;width:44px;height:44px;border:0;border-radius:50%;background:var(--t2);color:var(--ink);font-size:20px;cursor:pointer}
+.prep li{margin-bottom:4px}
+.file{position:relative;overflow:hidden}.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+dl.nf{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0}dl.nf dt{color:var(--mute)}dl.nf dd{margin:0;overflow-wrap:anywhere}
+.opts{display:grid;gap:10px;margin:14px 0}.opts.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.opts.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.opt{font:inherit;font-size:18px;font-weight:700;text-align:left;border:2px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:14px 16px;min-height:60px;cursor:pointer}
+.g4 .opt{text-align:center;padding:14px 4px}.opt.on{background:var(--g);border-color:var(--g);color:#fff}
+.wtop{display:flex;align-items:center;gap:12px;margin-bottom:8px}.wback{flex:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);font-size:26px;line-height:1;cursor:pointer}
+.wbar{flex:1;height:8px;border-radius:5px;background:var(--line);overflow:hidden}.wbar i{display:block;height:100%;background:var(--g);transition:width .3s}
+.wstep{min-height:calc(100vh - 330px)}.wstep h1{margin-top:12px}
+.wfoot{position:sticky;bottom:calc(74px + env(safe-area-inset-bottom));padding:12px 0 4px;background:linear-gradient(transparent,var(--bg) 30%)}
+.hero{padding:20px}
+.paid{display:flex;align-items:center;gap:8px;padding:0 0 10px 36px;margin-top:-4px}.paid label{flex:1;font-size:14px;color:var(--mute)}.paid input{width:110px;flex:none;text-align:right;min-height:44px;padding:8px 10px}
+.cbar{position:sticky;top:0;z-index:4;display:flex;justify-content:space-between;gap:10px;background:var(--g);color:#fff;border-radius:0 0 14px 14px;padding:10px 16px;margin:-4px 0 12px;font-size:15px;box-shadow:0 4px 10px #0002}.cbar .bad{color:#ffd0ca;font-weight:700}
+.nut{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0}.nut div{background:var(--g2);border-radius:12px;padding:8px}.nut b{display:block;font-size:17px;white-space:nowrap}.nut small{font-size:13px;color:var(--mute)}
+.tn{width:100%;border-collapse:collapse;font-size:15px}.tn th,.tn td{padding:8px 4px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}.tn th:first-child,.tn td:first-child{text-align:left}.tn th{font-size:13px;color:var(--mute);font-weight:600}.tn small{color:var(--mute)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+</head>
+<body>
+<header>
+ <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M7 15h26l-3 17a3 3 0 0 1-3 2.5H13A3 3 0 0 1 10 32z" fill="#f2b52b"/><path d="M13 15l5-8M27 15l-5-8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="16" cy="13" r="4" fill="#e2483a"/><path d="M25 7c4 0 6 3 5 7-4 0-6-3-5-7z" fill="#7fd3a5"/></svg>
+ <div><b>Cesta</b><span>planejador de compras</span></div>
+</header>
+<main>
+<section id="v-plan">
+ <div id="wstart">
+  <h1>Vamos planejar suas refeições</h1>
+  <div class="card hero">
+   <svg viewBox="0 0 320 150" aria-hidden="true" style="width:100%;height:auto;display:block"><rect x="0" y="118" width="320" height="32" rx="10" fill="var(--g2)"/><path d="M70 60h180l-18 78a10 10 0 0 1-10 8H98a10 10 0 0 1-10-8z" fill="#f2b52b"/><path d="M70 60h180l-4 16H74z" fill="#d99a12"/><path d="M115 60l28-44M205 60l-28-44" stroke="var(--g)" stroke-width="9" stroke-linecap="round" fill="none"/><circle cx="120" cy="52" r="20" fill="#d63c2f"/><circle cx="114" cy="46" r="5" fill="#fff" opacity=".45"/><path d="M200 18c22 0 34 18 28 40-22 0-34-18-28-40z" fill="#3f9b63"/><ellipse cx="165" cy="48" rx="26" ry="14" fill="#f6d37a" transform="rotate(-20 165 48)"/><rect x="226" y="28" width="22" height="34" rx="4" fill="#fff" stroke="var(--line)"/><path d="M231 38h12M231 45h12M231 52h8" stroke="var(--mute)" stroke-width="2"/></svg>
+   <p style="margin:12px 0 0">Responda algumas perguntas rápidas, uma por tela. No fim você recebe o cardápio, a lista de compras e quanto vai gastar.</p>
+  </div>
+  <button class="btn" id="wgo">Planejar refeições</button>
+  <p class="hint" id="wlast" style="text-align:center;margin-top:12px"></p>
+  <p class="hint" style="text-align:center" id="wbadP"><button class="btn sm alt" id="wbad"></button></p>
+ </div>
+ <div id="wiz" hidden>
+  <div class="wtop"><button class="wback" id="wprev" aria-label="Voltar">‹</button><div class="wbar"><i id="wbar"></i></div><span id="wcount" class="hint" style="margin:0"></span></div>
+
+  <div class="wstep" data-k="reg"><h1>Onde você faz compras?</h1><p class="hint">Os preços médios mudam de cidade para cidade.</p><div class="opts" id="reg"></div><p class="hint">Quixadá usa os preços da pesquisa DIEESE de Fortaleza (out/2026) até termos dados do interior. No app final, o GPS do celular escolhe sozinho.</p></div>
+
+  <div class="wstep" data-k="people"><h1>Para quantas pessoas?</h1><div class="opts g4" id="ppl"></div></div>
+
+  <div class="wstep" data-k="days"><h1>Por quanto tempo?</h1><div class="opts" id="per"></div></div>
+
+  <div class="wstep" data-k="budget"><h1>Quanto você pode gastar?</h1><div class="opts g2" id="bud"></div>
+   <label class="l" for="budget" style="margin-top:16px">Outro valor</label><div class="money"><span>R$</span><input id="budget" type="number" inputmode="decimal" min="20" step="10" value="250"></div></div>
+
+  <div class="wstep" data-k="meals"><h1>Quais refeições você faz em casa?</h1>
+   <div class="opts" id="mpd"><button type="button" class="opt" data-v="2">Almoço e jantar</button><button type="button" class="opt" data-v="1">Só uma refeição principal</button></div>
+   <label class="sw"><input type="checkbox" id="bf" checked><span><b>Também tomo café da manhã em casa</b></span></label></div>
+
+  <div class="wstep" data-k="out"><h1>Quantas vezes por semana você come fora?</h1><p class="hint">Restaurante, marmita do trabalho, delivery. Essas refeições saem da compra.</p><div class="opts g4" id="outo"></div></div>
+
+  <div class="wstep" data-k="cook"><h1>Quantas vezes por semana você cozinha?</h1><p class="hint">Cozinhando menos vezes, cada preparo rende mais refeições.</p>
+   <div class="opts" id="cook"><button type="button" class="opt" data-v="7">Todo dia</button><button type="button" class="opt" data-v="4">3 a 4 vezes</button><button type="button" class="opt" data-v="2">1 a 2 vezes</button></div>
+   <label class="sw"><input type="checkbox" id="marmita"><span><b>Modo marmita</b><span class="hint">Cozinhe tudo num dia da semana e congele o que passar de 3 dias.</span></span></label></div>
+
+  <div class="wstep" data-k="snk"><h1>Quer lanches entre as refeições?</h1><p class="hint">Fruta, pipoca, iogurte, biscoito…</p>
+   <div class="opts" id="snk"><button type="button" class="opt" data-v="0">Não, obrigado</button><button type="button" class="opt" data-v="1">1 lanche por dia</button><button type="button" class="opt" data-v="2">2 lanches por dia</button></div></div>
+
+  <div class="wstep" data-k="restr"><h1>Alguma restrição ou intolerância?</h1><p class="hint">Toque em todas que valem. Se não tiver, é só continuar.</p><div class="chips" id="restr"></div></div>
+
+  <div class="wstep" data-k="cuis"><h1>Que comida você curte?</h1><p class="hint">Escolha quantas quiser. Sem escolha, o app varia entre todas.</p><div class="chips" id="cuis"></div></div>
+
+  <div class="wstep" data-k="dis"><h1>Tem algum ingrediente que você não gosta?</h1><p class="hint">Se for só tempero, ele sai da receita. Se for o principal, a receita sai do cardápio.</p>
+   <div class="chips" id="dis"></div>
+   <div class="add"><input id="disIn" list="dl" type="text" placeholder="Outro ingrediente…" aria-label="Outro ingrediente que você não gosta"><button type="button" class="btn alt" id="disAdd">Adicionar</button></div></div>
+
+  <div class="wstep" data-k="pantry"><h1>O que você já tem em casa?</h1><p class="hint">Sai da lista e do custo. Deixe a quantidade vazia se tem bastante.</p>
+   <div class="chips" id="panq"></div>
+   <div id="pantry" style="margin-top:12px"></div>
+   <div class="add"><input id="panIn" list="dl" type="text" placeholder="Outro item…" aria-label="Ingrediente que você já tem"><button type="button" class="btn alt" id="panAdd">Adicionar</button></div></div>
+
+  <div class="wstep" data-k="kcal"><h1>Quantas calorias por pessoa por dia?</h1><p class="hint">O app aumenta ou diminui arroz, feijão e massa para chegar perto da meta.</p>
+   <div class="opts g2" id="kc"></div>
+   <label class="l" for="kcal" style="margin-top:16px">Outro valor</label><input id="kcal" type="number" inputmode="numeric" min="1000" max="4500" step="100" placeholder="ex.: 2300"></div>
+
+  <div class="wstep" data-k="prot"><h1>Quer comer mais proteína?</h1><p class="hint">Bom para quem treina ou quer mais saciedade. Pode mudar depois no cardápio.</p>
+   <div class="opts" id="prot"><button type="button" class="opt" data-v="0">Normal</button><button type="button" class="opt" data-v="1">Mais proteína</button><button type="button" class="opt" data-v="2">Bem mais proteína</button></div></div>
+
+  <datalist id="dl"></datalist>
+  <div class="wfoot"><button class="btn" id="wnext">Continuar</button></div>
+ </div>
+</section>
+
+<section id="v-menu" hidden></section>
+<section id="v-list" hidden></section>
+<section id="v-prices" hidden>
+ <h1>Tabela de preços</h1>
+ <div class="card ok"><p style="margin:0">Itens <span class="src">pesquisado</span> vêm da cesta básica DIEESE de out/2026 (Fortaleza para o Ceará, Procon-SP para São Paulo). Itens <span class="src e">estimativa</span> são aproximações ajustadas pelo custo da cesta da sua cidade. Itens <span class="src n">pelo que você pagou</span> foram ajustados com os preços que você digitou no mercado ou na nota. Toque num preço para trocar pelo do seu mercado; fica salvo neste aparelho.</p>
+ <button class="btn alt" id="resetP" style="margin-top:12px">Voltar aos preços originais</button></div>
+ <div id="plist"></div>
+</section>
+</main>
+
+<nav>
+ <button data-v="plan" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h10M4 18h7"/></svg>Planejar</button>
+ <button data-v="menu" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Cardápio</button>
+ <button data-v="list" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 8h14l-1.5 11h-11z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg>Lista</button>
+ <button data-v="prices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9h8v8l-9 9z"/><circle cx="16" cy="8" r="1.5"/></svg>Preços</button>
+</nav>
+
+<div class="ov" id="ov" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ls={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const R$=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const W=g=>g>=1000?(g/1000).toLocaleString('pt-BR',{maximumFractionDigits:2})+' kg':Math.round(g)+' g';
+const Q=(id,g)=>id==='ovos'?Math.max(1,Math.ceil(g/50-1e-9))+' un':W(g);
+
+// Corredores na ordem em que se anda num supermercado típico (suposição: cada loja tem a sua)
+const CATS=['Hortifruti','Padaria','Carnes, peixes e ovos','Laticínios','Grãos e massas','Mercearia'];
+// [id, nome, categoria, embalagens [[gramas, preço, rótulo]], kcal/100g, tags, fonte p/e, passo do granel em g]
+// Itens a granel: uma "embalagem" [1000, preço/kg] e o passo mínimo de compra.
+const RAW=[
+['tomate','Tomate','Hortifruti',[[1000,9.5]],18,'','p',250],
+['cebola','Cebola','Hortifruti',[[1000,8.36]],40,'','p',250],
+['alho','Alho','Hortifruti',[[1000,30.95]],150,'','p',100],
+['cenoura','Cenoura','Hortifruti',[[1000,5.9]],40,'','p',250],
+['batata','Batata','Hortifruti',[[1000,7.75]],77,'','p',250],
+['batata_doce','Batata-doce','Hortifruti',[[1000,5.9]],86,'','p',250],
+['mandioca','Mandioca','Hortifruti',[[1000,5.5]],160,'','p',250],
+['abobrinha','Abobrinha','Hortifruti',[[1000,6.9]],20,'','p',250],
+['pimentao','Pimentão','Hortifruti',[[1000,9.9]],25,'','p',250],
+['repolho','Repolho','Hortifruti',[[1000,4.5]],25,'','p',250],
+['pepino','Pepino','Hortifruti',[[1000,5.9]],15,'','e',250],
+['abacate','Abacate','Hortifruti',[[1000,9.9]],160,'','p',250],
+['limao','Limão','Hortifruti',[[1000,5.5]],30,'','p',250],
+['banana','Banana','Hortifruti',[[1000,6.5]],90,'','p',250],
+['maca','Maçã','Hortifruti',[[1000,10.9]],52,'','p',250],
+['laranja','Laranja','Hortifruti',[[1000,4.5]],47,'','p',250],
+['gengibre','Gengibre','Hortifruti',[[1000,25.9]],80,'','e',100],
+['alface','Alface','Hortifruti',[[250,3.5,'pé']],15,'','p'],
+['brocolis','Brócolis','Hortifruti',[[400,6.9,'maço']],35,'','p'],
+['cheiro','Cheiro-verde','Hortifruti',[[50,2.5,'maço']],25,'','p'],
+['coentro','Coentro','Hortifruti',[[50,2.5,'maço']],25,'','e'],
+['frango','Peito de frango','Carnes, peixes e ovos',[[1000,19.9]],160,'carne','e',250],
+['carne_moida','Carne moída (patinho)','Carnes, peixes e ovos',[[1000,42.9]],220,'carne','e',250],
+['linguica','Linguiça fresca','Carnes, peixes e ovos',[[1000,24.36]],300,'carne','p',250],
+['salmao','Salmão','Carnes, peixes e ovos',[[1000,89.9]],210,'peixe','e',250],
+['tilapia','Filé de tilápia','Carnes, peixes e ovos',[[1000,49.9,'pacote congelado 1 kg']],130,'peixe','e'],
+['camarao','Camarão limpo','Carnes, peixes e ovos',[[400,34.9,'pacote congelado 400 g']],100,'frutos_mar','e'],
+['atum','Atum em lata','Carnes, peixes e ovos',[[120,9.9,'lata 170 g']],190,'peixe','p'],
+['ovos','Ovos','Carnes, peixes e ovos',[[600,10.1,'dúzia'],[1500,22.9,'bandeja 30 un']],145,'ovo','p'],
+['tofu','Tofu','Carnes, peixes e ovos',[[400,14.9,'bandeja 400 g']],80,'soja','e'],
+['leite','Leite integral','Laticínios',[[1000,5.71,'caixa 1 L']],60,'lactose laticinio','p'],
+['leite_sl','Leite sem lactose','Laticínios',[[1000,6.5,'caixa 1 L']],60,'laticinio','e'],
+['leite_veg','Bebida vegetal de soja','Laticínios',[[1000,8.9,'caixa 1 L']],40,'soja','e'],
+['queijo','Queijo muçarela','Laticínios',[[1000,56.64]],300,'lactose laticinio','p',100],
+['iogurte','Iogurte natural','Laticínios',[[170,3.5,'pote 170 g']],60,'lactose laticinio','p'],
+['manteiga','Manteiga','Laticínios',[[200,12.9,'pote 200 g']],720,'lactose laticinio','p'],
+['creme_leite','Creme de leite','Laticínios',[[200,4.2,'caixinha 200 g']],200,'lactose laticinio','e'],
+['creme_leite_sl','Creme de leite sem lactose','Laticínios',[[200,6.9,'caixinha 200 g']],200,'laticinio','e'],
+['arroz','Arroz branco','Grãos e massas',[[1000,5.49,'pacote 1 kg'],[5000,21.98,'pacote 5 kg']],360,'','p'],
+['arroz_jp','Arroz japonês','Grãos e massas',[[1000,14.9,'pacote 1 kg']],355,'','e'],
+['feijao','Feijão carioca','Grãos e massas',[[1000,8.27,'pacote 1 kg']],330,'','p'],
+['feijao_preto','Feijão preto','Grãos e massas',[[1000,8.5,'pacote 1 kg']],330,'','e'],
+['pipoca','Milho de pipoca','Grãos e massas',[[500,5.5,'pacote 500 g']],375,'','e'],
+['lentilha','Lentilha','Grãos e massas',[[500,8.9,'pacote 500 g']],350,'','e'],
+['grao','Grão-de-bico','Grãos e massas',[[500,9.9,'pacote 500 g']],360,'','e'],
+['macarrao','Macarrão espaguete com ovos','Grãos e massas',[[500,3.45,'pacote 500 g']],370,'gluten ovo','p'],
+['macarrao_arroz','Macarrão de arroz','Grãos e massas',[[500,12.9,'pacote 500 g']],360,'','e'],
+['tortilla','Tortilha de trigo','Grãos e massas',[[320,11.9,'pacote 8 un']],300,'gluten','e'],
+['tortilla_milho','Tortilha de milho','Grãos e massas',[[300,13.9,'pacote 10 un']],220,'','e'],
+['biscoito','Biscoito água e sal','Padaria',[[200,3.12,'pacote 200 g']],430,'gluten','p'],
+['pao','Pão de forma','Padaria',[[500,7.04,'pacote 500 g']],250,'gluten','p'],
+['tapioca','Goma de tapioca','Padaria',[[500,6.9,'pacote 500 g']],240,'','e'],
+['oleo','Óleo de soja','Mercearia',[[900,7.86,'garrafa 900 ml']],880,'','p'],
+['azeite','Azeite','Mercearia',[[500,34.9,'garrafa 500 ml']],880,'','e'],
+['sal','Sal','Mercearia',[[1000,3.2,'pacote 1 kg']],0,'','p'],
+['acucar','Açúcar','Mercearia',[[1000,4.9,'pacote 1 kg'],[5000,17.78,'pacote 5 kg']],400,'','p'],
+['cafe','Café em pó','Mercearia',[[500,24.4,'pacote 500 g']],0,'','p'],
+['molho_tomate','Molho de tomate','Mercearia',[[300,2.9,'sachê 300 g']],40,'','e'],
+['milho','Milho verde','Mercearia',[[120,4.5,'lata 170 g']],90,'','p'],
+['shoyu','Shoyu','Mercearia',[[150,6.9,'frasco 150 ml']],60,'gluten soja','e'],
+['shoyu_sg','Shoyu sem glúten (tamari)','Mercearia',[[150,14.9,'frasco 150 ml']],60,'soja','e'],
+['leite_coco','Leite de coco','Mercearia',[[200,4.9,'vidro 200 ml']],180,'','e'],
+['curry','Curry em pó','Mercearia',[[30,5.9,'pote 30 g']],0,'','e'],
+['cominho','Cominho','Mercearia',[[30,4.5,'pote 30 g']],0,'','e'],
+['amendoim','Amendoim torrado','Mercearia',[[500,11.9,'pacote 500 g']],570,'amendoim','e'],
+['nori','Alga nori','Mercearia',[[25,12.9,'pacote 10 folhas']],0,'','e'],
+['vinagre_arroz','Vinagre de arroz','Mercearia',[[300,8.9,'garrafa 300 ml']],0,'','e'],
+];
+const BASE={},IT={};
+RAW.forEach(([id,n,cat,packs,kcal,tags,src,step])=>{BASE[id]=packs.map(p=>p[1]);IT[id]={id,n,cat,packs:packs.map(p=>({q:p[0],p:p[1],l:p[2]||''})),kcal,tags:tags?tags.split(' '):[],src,step}});
+// Fator regional: custo da cesta DIEESE out/2026 na capital ÷ custo em SP (R$ 951)
+// Ceará: preços médios da cesta DIEESE de Fortaleza, out/2026 (O POVO, 11/11/2026). Quixadá usa Fortaleza até termos dados do interior.
+const CE={arroz:[6.49,28.35],feijao:[8.76],leite:[7.54],tomate:[12.59],cafe:[30.4],banana:[5.8],acucar:[4.2,18.45],oleo:[9.04],manteiga:[14.44],carne_moida:[46.42]};
+const REG=[['QXD','Quixadá (CE)',822.70/951.37,CE],['FOR','Fortaleza (CE)',822.70/951.37,CE],['SP','São Paulo',1,null],['BH','Belo Horizonte',811/951,null],['DF','Brasília',811/951,null],['PE','Recife',706/951,null],['BA','Salvador',678/951,null]];
+const avg=a=>a.reduce((s,x)=>s+x,0)/a.length;
+function applyPrices(){const o=ls.get('cesta.precos',{}),obs=ls.get('cesta.obs',{}),R=REG.find(r=>r[0]===ls.get('cesta.form',{}).region)||REG[0],rg=R[2],ov=R[3]||{};
+ for(const id in IT){const cob=ls.get('cesta.cartobs',{}),fs=[...(obs[id]||[]),...(cob[id]!=null?[cob[id]]:[])],f=fs.length?avg([1,...fs]):1;IT[id].adj=f!==1;IT[id].rsrc=ov[id]?'d':R[0]==='SP'?IT[id].src:'e';IT[id].packs.forEach((pk,i)=>{pk.p=(o[id]&&o[id][i]!=null)?o[id][i]:+((ov[id]&&ov[id][i]!=null?ov[id][i]:BASE[id][i]*rg)*f).toFixed(2)})}}
+applyPrices();
+
+const SUBS={macarrao:['macarrao_arroz'],tortilla:['tortilla_milho'],shoyu:['shoyu_sg'],pao:['tapioca'],leite:['leite_sl','leite_veg'],creme_leite:['creme_leite_sl','leite_coco'],manteiga:['oleo']};
+const MINOR=40; // até 40 g por porção o ingrediente é "de apoio" e pode sair da receita
+const RESTR=[['gluten','Sem glúten',['gluten']],['lactose','Sem lactose',['lactose']],['veg','Vegetariano',['carne','peixe','frutos_mar']],['vegano','Vegano',['carne','peixe','frutos_mar','ovo','laticinio']],['mar','Alergia a frutos do mar',['frutos_mar']],['peixe','Alergia a peixe',['peixe']],['amendoim','Alergia a amendoim',['amendoim']],['ovo','Alergia a ovo',['ovo']],['soja','Alergia a soja',['soja']]];
+const CUIS=['Brasileira','Italiana','Mexicana','Asiática','Japonesa','Indiana','Árabe'];
+const DIS_QUICK=['cebola','alho','coentro','pimentao','abobrinha','brocolis','tofu','abacate','pepino','linguica','salmao','camarao'];
+const COOK_BASE=['arroz','arroz_jp','feijao','feijao_preto','lentilha','grao','macarrao','macarrao_arroz','batata','batata_doce','mandioca','pao','tapioca','banana','tortilla','tortilla_milho'];
+const PANTRYISH=new Set(['sal','oleo','azeite']);
+const RECIPES=[
+['Arroz, feijão e frango grelhado','Brasileira',{arroz:80,feijao:60,frango:150,cebola:20,alho:5,oleo:10,sal:3,alface:40,tomate:60},'Cozinhe o feijão na pressão. Refogue alho e cebola no óleo e faça o arroz. Tempere o frango com sal e alho e grelhe. Sirva com salada de alface e tomate.'],
+['Strogonoff de frango','Brasileira',{frango:150,creme_leite:50,molho_tomate:40,cebola:30,alho:5,arroz:80,batata:120,oleo:15,sal:2},'Doure o frango em cubos com cebola e alho. Junte o molho de tomate e cozinhe 10 min. Desligue o fogo e misture o creme de leite. Sirva com arroz e batata assada em palitos.'],
+['Feijoada simples','Brasileira',{feijao_preto:90,linguica:120,cebola:30,alho:6,repolho:60,arroz:80,oleo:5,sal:2},'Deixe o feijão de molho. Doure a linguiça em rodelas, junte cebola, alho, o feijão e água e cozinhe na pressão por 35 min. Refogue o repolho fatiado fino. Sirva com arroz.'],
+['Escondidinho de carne moída','Brasileira',{carne_moida:120,mandioca:220,cebola:30,alho:5,manteiga:10,queijo:30,leite:50,sal:2,oleo:5},'Cozinhe a mandioca e amasse com manteiga e leite. Refogue a carne com cebola e alho. Monte: carne embaixo, purê em cima, queijo por cima. Leve ao forno até gratinar.'],
+['Omelete com arroz e salada','Brasileira',{ovos:120,tomate:70,cebola:20,arroz:80,alface:40,cheiro:5,oleo:8,sal:2},'Bata os ovos com sal e cheiro-verde. Junte tomate e cebola picados e frite em frigideira untada, virando uma vez. Sirva com arroz e salada.'],
+['Tilápia assada com batatas','Brasileira',{tilapia:150,batata:220,limao:20,azeite:10,alho:5,cebola:30,sal:3},'Tempere os filés com limão, alho e sal. Fatie batata e cebola, arrume na assadeira com azeite e asse 20 min. Coloque o peixe por cima e asse mais 15 min.'],
+['Sopa de legumes com frango','Brasileira',{frango:100,batata:130,cenoura:70,abobrinha:70,cebola:30,alho:5,oleo:5,sal:3},'Refogue cebola e alho, junte o frango em cubos e doure. Adicione batata e cenoura e cubra com água. Cozinhe 20 min, junte a abobrinha e cozinhe mais 5 min.'],
+['Atum com batata-doce e salada','Brasileira',{atum:100,batata_doce:220,tomate:60,cebola:20,alface:40,azeite:8,limao:10,sal:2},'Asse ou cozinhe a batata-doce em rodelas. Misture o atum com tomate, cebola, azeite e limão. Sirva sobre a alface com a batata-doce.'],
+['Camarão ao alho com arroz','Brasileira',{camarao:120,alho:10,azeite:10,arroz:80,limao:15,cheiro:5,tomate:50,sal:2},'Tempere o camarão com limão e sal. Doure bastante alho no azeite, junte camarão e tomate e salteie 3 a 4 min. Finalize com cheiro-verde e sirva com arroz.'],
+['Espaguete à bolonhesa','Italiana',{macarrao:110,carne_moida:100,molho_tomate:90,cebola:25,alho:5,cenoura:30,oleo:5,sal:2},'Refogue cebola, alho e cenoura ralada, junte a carne e doure. Adicione o molho e cozinhe 15 min. Cozinhe o macarrão em água com sal e misture ao molho.'],
+['Macarrão alho e óleo com brócolis','Italiana',{macarrao:110,brocolis:130,alho:10,azeite:15,sal:2},'Cozinhe o macarrão e, nos últimos 3 min, junte o brócolis na mesma água. Doure alho laminado no azeite e misture tudo.'],
+['Risoto de abobrinha','Italiana',{arroz:90,abobrinha:150,queijo:30,manteiga:10,cebola:25,alho:5,oleo:5,sal:2},'Refogue cebola e alho, junte o arroz e mexa 1 min. Vá adicionando água quente e mexendo por uns 18 min. Junte a abobrinha ralada no fim e termine com manteiga e queijo.'],
+['Tacos de carne','Mexicana',{tortilla:100,carne_moida:120,tomate:60,cebola:30,alface:30,limao:15,cominho:1,coentro:3,oleo:5,sal:2},'Refogue a carne com cebola, cominho e sal. Pique tomate, cebola e coentro com limão. Aqueça as tortilhas e recheie com carne, alface e o vinagrete.'],
+['Burrito de feijão e queijo','Mexicana',{tortilla:100,feijao_preto:70,arroz:50,milho:50,queijo:30,tomate:50,pimentao:40,cominho:1,oleo:5,sal:2},'Cozinhe o feijão e amasse levemente com cominho. Refogue pimentão e milho. Recheie as tortilhas com arroz, feijão, legumes, tomate e queijo, enrole e doure.'],
+['Chili com carne','Mexicana',{carne_moida:100,feijao_preto:60,molho_tomate:80,cebola:30,pimentao:50,cominho:2,alho:5,arroz:80,oleo:5,sal:2},'Doure a carne com cebola, alho e pimentão. Junte cominho, molho de tomate e o feijão cozido. Cozinhe 20 min em fogo baixo e sirva com arroz.'],
+['Bowl mexicano com guacamole','Mexicana',{arroz:80,feijao_preto:60,abacate:100,milho:50,tomate:50,cebola:20,limao:15,coentro:3,sal:2},'Amasse o abacate com limão, cebola, tomate, coentro e sal. Monte a tigela com arroz, feijão, milho e o guacamole por cima.'],
+['Yakisoba de frango','Asiática',{macarrao:100,frango:120,brocolis:60,cenoura:50,repolho:60,shoyu:20,gengibre:3,oleo:10},'Cozinhe o macarrão. Salteie o frango em tiras em óleo bem quente, depois cenoura, brócolis e repolho. Junte o macarrão, o shoyu e o gengibre ralado.'],
+['Frango xadrez','Asiática',{frango:150,pimentao:60,cebola:40,amendoim:20,shoyu:20,arroz:80,oleo:10,gengibre:3},'Doure o frango em cubos. Junte cebola e pimentão em cubos e salteie rápido. Adicione shoyu, gengibre e um pouco de água; finalize com amendoim. Sirva com arroz.'],
+['Arroz frito com ovo e legumes','Asiática',{arroz:90,ovos:60,cenoura:50,milho:30,cheiro:5,shoyu:15,oleo:10},'Use arroz já cozido, de preferência do dia anterior. Mexa os ovos e reserve. Salteie cenoura e milho, junte arroz, ovo e shoyu. Finalize com cheiro-verde.'],
+['Tofu com legumes ao gengibre','Asiática',{tofu:150,brocolis:80,cenoura:50,gengibre:5,alho:5,shoyu:15,arroz:80,oleo:10},'Seque o tofu e doure em cubos. Salteie alho, gengibre, cenoura e brócolis. Junte o tofu e o shoyu e sirva com arroz.'],
+['Sushi bowl de salmão','Japonesa',{arroz_jp:100,salmao:100,pepino:50,abacate:40,nori:3,vinagre_arroz:10,acucar:4,shoyu:15,sal:1},'Cozinhe o arroz japonês e tempere com vinagre de arroz, açúcar e sal. Monte com salmão em cubos, pepino, abacate e nori picada. Regue com shoyu.'],
+['Oyakodon (frango com ovo)','Japonesa',{arroz_jp:100,frango:130,ovos:60,cebola:50,shoyu:20,acucar:5,cheiro:3},'Cozinhe cebola fatiada com shoyu, açúcar e um pouco de água. Junte o frango em cubos. Despeje os ovos batidos, tampe por 1 min e sirva sobre o arroz.'],
+['Sushi bowl de tofu','Japonesa',{arroz_jp:100,tofu:100,pepino:60,cenoura:40,abacate:60,nori:3,vinagre_arroz:10,acucar:4,shoyu:15},'Tempere o arroz japonês com vinagre e açúcar. Doure o tofu com um pouco de shoyu. Monte com pepino, cenoura ralada, abacate e nori.'],
+['Frango teriyaki','Japonesa',{frango:150,shoyu:25,acucar:10,gengibre:3,alho:4,arroz_jp:100,brocolis:60,oleo:5},'Doure o frango. Junte shoyu, açúcar, gengibre, alho e um pouco de água e reduza até virar calda. Sirva com arroz e brócolis cozido.'],
+['Curry de grão-de-bico','Indiana',{grao:80,leite_coco:60,tomate:80,cebola:40,alho:5,gengibre:3,curry:3,arroz:80,oleo:10,sal:2},'Deixe o grão de molho e cozinhe na pressão. Refogue cebola, alho, gengibre e curry, junte tomate e o grão. Adicione leite de coco e cozinhe 10 min. Sirva com arroz.'],
+['Dal de lentilha','Indiana',{lentilha:80,tomate:60,cebola:30,alho:5,gengibre:3,curry:3,arroz:80,oleo:10,sal:2},'Refogue cebola, alho, gengibre e curry. Junte lentilha, tomate e água e cozinhe 25 min até ficar cremoso. Sirva com arroz.'],
+['Frango ao curry','Indiana',{frango:150,leite_coco:60,curry:3,cebola:30,alho:5,arroz:80,oleo:10,sal:2},'Doure o frango em cubos. Junte cebola, alho e curry. Adicione leite de coco e cozinhe 10 min. Sirva com arroz.'],
+['Kafta com arroz e salada','Árabe',{carne_moida:130,cebola:25,cominho:1,tomate:60,pepino:60,arroz:70,limao:10,azeite:5,sal:2},'Misture a carne com cebola ralada, cominho e sal e modele em rolinhos. Grelhe ou asse. Sirva com arroz e salada de tomate e pepino com limão e azeite.'],
+['Homus com legumes assados','Árabe',{grao:70,azeite:15,limao:15,alho:5,batata_doce:150,cenoura:80,abobrinha:80,sal:2},'Bata o grão-de-bico cozido com alho, limão, azeite, sal e um pouco de água. Asse batata-doce, cenoura e abobrinha em pedaços com azeite. Sirva juntos.'],
+['Mujadara (arroz com lentilha)','Árabe',{lentilha:60,arroz:60,cebola:60,oleo:15,cominho:1,tomate:50,pepino:50,limao:10,sal:2},'Cozinhe a lentilha até ficar al dente, junte o arroz e água e termine juntos. Caramelize bastante cebola no óleo e coloque por cima. Sirva com salada de tomate e pepino.'],
+].map(([n,c,ing,s],i)=>({id:i,n,c,ing,s}));
+const SNACKS=[['Maçã',{maca:150}],['Pipoca',{pipoca:30,oleo:5,sal:1}],['Banana',{banana:120}],['Iogurte natural',{iogurte:170}],['Laranja',{laranja:180}],['Biscoito água e sal',{biscoito:30}],['Amendoim',{amendoim:30}],['Ovo cozido',{ovos:100}],['Cenoura em palitos',{cenoura:100}]];
+const OUT_KCAL=700; // suposição: uma refeição fora de casa equivale a ~700 kcal
+const BREAKFAST={pao:50,leite:200,banana:100,manteiga:5,cafe:10};
+const COOK=['arroz','arroz_jp','feijao','feijao_preto','lentilha','grao','macarrao','macarrao_arroz','batata','batata_doce','mandioca'];
+const CHOP=['cebola','alho','cenoura','pimentao','abobrinha','brocolis','repolho','tomate','pepino','gengibre'];
+
+// ---------- formulário ----------
+const st=Object.assign({prot:0,bad:[],fav:[],region:"QXD",budget:250,out:0,cook:7,snk:0,people:2,days:7,mpd:2,bf:true,marmita:false,restr:[],cuis:[],dis:[],kcal:'',pantry:{}},ls.get('cesta.form',{}));
+if(!st.v2){st.region='QXD';st.v2=1}
+let plan=null,seed=Date.now()%100000;
+const save=()=>ls.set('cesta.form',st);
+const findItem=t=>{t=t.trim().toLowerCase();return Object.values(IT).find(i=>i.n.toLowerCase()===t)||Object.values(IT).find(i=>i.n.toLowerCase().includes(t))};
+function chips(el,items,key,cls=''){el.innerHTML=items.map(([v,l])=>`<button type="button" class="chip ${cls} ${st[key].includes(v)?'on':''}" data-v="${esc(v)}" aria-pressed="${st[key].includes(v)}">${esc(l)}</button>`).join('')}
+const PAN_QUICK=['arroz','feijao','oleo','sal','acucar','cafe','macarrao','alho','cebola','ovos'];
+const OPTS=[['reg','region',()=>REG.map(r=>[r[0],r[1]])],['ppl','people',()=>[1,2,3,4,5,6,7,8].map(n=>[n,n])],['per','days',()=>[[7,'1 semana'],[10,'10 dias'],[14,'2 semanas'],[21,'3 semanas'],[30,'1 mês']]],
+ ['bud','budget',()=>[150,200,250,300,400,500,700,1000].map(v=>[v,'R$ '+v.toLocaleString('pt-BR')])],['outo','out',()=>[[0,'Nunca'],[1,1],[2,2],[3,3],[4,4],[5,5],[7,7],[10,10]]],
+ ['kc','kcal',()=>[['','Não sei (2.000)'],[1500,'1.500'],[1800,'1.800'],[2200,'2.200'],[2500,'2.500'],[3000,'3.000']]],['mpd','mpd'],['cook','cook'],['snk','snk'],['prot','prot']];
+function renderForm(){
+ OPTS.forEach(([id,key,list])=>{if(list)$('#'+id).innerHTML=list().map(([v,l])=>`<button type="button" class="opt" data-v="${esc(v)}">${esc(l)}</button>`).join('');
+  $('#'+id).querySelectorAll('.opt').forEach(b=>{const on=String(st[key])===b.dataset.v;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)})});
+ if(document.activeElement!==$('#budget'))$('#budget').value=st.budget;$('#kcal').value=[1500,1800,2200,2500,3000].includes(+st.kcal)?'':st.kcal;$('#bf').checked=st.bf;$('#marmita').checked=st.marmita;
+ $('#panq').innerHTML=PAN_QUICK.map(id=>`<button type="button" class="chip ${id in st.pantry?'on':''}" data-v="${id}" aria-pressed="${id in st.pantry}">${esc(IT[id].n)}</button>`).join('');
+ $('#wbadP').hidden=!st.bad.length;$('#wbad').textContent=st.bad.length+(st.bad.length>1?' receitas escondidas':' receita escondida')+': mostrar de novo';
+ const R=REG.find(r=>r[0]===st.region)||REG[0];$('#wlast').textContent=ls.get('cesta.form',null)?`Último plano: ${st.people} ${st.people>1?'pessoas':'pessoa'}, ${st.days} dias, ${R$(+st.budget)}, ${R[1]}. Protótipo com preços médios de out/2026.`:'Protótipo com preços médios de out/2026.';
+ chips($('#restr'),RESTR.map(r=>[r[0],r[1]]),'restr');
+ chips($('#cuis'),CUIS.map(c=>[c,c]),'cuis');
+ chips($('#dis'),[...new Set([...DIS_QUICK,...st.dis])].map(id=>[id,IT[id].n]),'dis','no');
+ $('#pantry').innerHTML=Object.entries(st.pantry).map(([id,q])=>`<div class="pan"><span>${esc(IT[id].n)}</span><input type="number" inputmode="numeric" min="0" placeholder="bastante" value="${q==null?'':id==='ovos'?Math.round(q/50):q}" data-id="${id}" aria-label="Quantidade de ${esc(IT[id].n)} em ${id==='ovos'?'unidades':'gramas'}"><span style="flex:none;width:2ch">${id==='ovos'?'un':'g'}</span><button type="button" data-rm="${id}" aria-label="Tirar ${esc(IT[id].n)}">×</button></div>`).join('')||'<p class="hint" style="margin:0">Nada ainda.</p>';
+ $('#dl').innerHTML=Object.values(IT).map(i=>`<option value="${esc(i.n)}">`).join('');
+}
+const toggle=(key,v)=>{const a=st[key];const i=a.indexOf(v);i<0?a.push(v):a.splice(i,1);save();renderForm()};
+['restr','cuis','dis'].forEach(k=>$('#'+k).onclick=e=>{const b=e.target.closest('.chip');if(b)toggle(k,b.dataset.v)});
+function addFrom(inp,fn){const it=findItem(inp.value);if(!inp.value.trim())return;if(!it){inp.value='';inp.placeholder='Não achei na tabela de preços';return}inp.value='';fn(it.id);save();renderForm()}
+$('#disAdd').onclick=()=>addFrom($('#disIn'),id=>{if(!st.dis.includes(id))st.dis.push(id)});
+$('#panAdd').onclick=()=>addFrom($('#panIn'),id=>{if(!(id in st.pantry))st.pantry[id]=null});
+$('#disIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#disAdd').click()}};
+$('#panIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#panAdd').click()}};
+$('#pantry').onclick=e=>{const b=e.target.closest('[data-rm]');if(b){delete st.pantry[b.dataset.rm];save();renderForm()}};
+$('#pantry').onchange=e=>{const i=e.target.closest('input[data-id]');if(!i)return;const v=i.value===''?null:Math.max(0,+i.value)*(i.dataset.id==='ovos'?50:1);st.pantry[i.dataset.id]=v;save()};
+$('#budget').oninput=e=>{st.budget=Math.max(0,+e.target.value||0);save();renderForm()};
+$('#kcal').onchange=e=>{st.kcal=e.target.value?Math.min(4500,Math.max(1000,+e.target.value)):'';save();renderForm()};
+$('#bf').onchange=e=>{st.bf=e.target.checked;save()};
+$('#marmita').onchange=e=>{st.marmita=e.target.checked;save()};
+OPTS.forEach(([id,key])=>$('#'+id).onclick=e=>{const b=e.target.closest('.opt');if(!b)return;const v=b.dataset.v;st[key]=key==='region'||v===''?v:+v;save();
+ if(key==='region'){applyPrices();if(plan)run(false,true)}renderForm()});
+$('#panq').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;const id=b.dataset.v;if(id in st.pantry)delete st.pantry[id];else st.pantry[id]=null;save();renderForm()};
+// ---------- assistente: uma pergunta por tela ----------
+const steps=[...document.querySelectorAll('.wstep')];let wi=-1;
+function wshow(i){wi=i;$('#wstart').hidden=i>=0;$('#wiz').hidden=i<0;steps.forEach((s,j)=>s.hidden=j!==i);
+ if(i>=0){$('#wbar').style.width=((i+1)/steps.length*100)+'%';$('#wcount').textContent=(i+1)+' de '+steps.length;$('#wnext').textContent=i===steps.length-1?'Gerar lista e cardápio':'Continuar'}
+ scrollTo(0,0)}
+$('#wgo').onclick=()=>wshow(0);
+$('#wbad').onclick=()=>{st.bad=[];save();renderForm()};
+$('#wprev').onclick=()=>wshow(wi-1);
+$('#wnext').onclick=()=>{if(wi<steps.length-1)wshow(wi+1);else{seed=Date.now()%100000;run()}};
+
+// ---------- motor ----------
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const ppg=id=>Math.min(...IT[id].packs.map(p=>p.p/p.q));
+function buy(id,need){
+ const it=IT[id];
+ if(it.step){const n=Math.ceil(need/it.step-1e-9),g=n*it.step;return{cost:g/1000*it.packs[0].p,desc:W(g)+' a granel',g}}
+ const ps=[...it.packs].sort((a,b)=>a.q-b.q),s=ps[0],L=ps[ps.length-1];let best=null;
+ for(let nb=0;nb<=Math.ceil(need/L.q-1e-9);nb++){const ns=ps.length>1?Math.ceil(Math.max(0,need-nb*L.q)/s.q-1e-9):0;
+  if(ps.length===1&&nb*L.q<need-1e-9)continue;const cost=nb*L.p+ns*s.p*(ps.length>1);if(!best||cost<best.cost-1e-9)best={cost,nb,ns}}
+ const parts=[];if(best.nb)parts.push(best.nb+' × '+L.l);if(ps.length>1&&best.ns)parts.push(best.ns+' × '+s.l);
+ return{cost:best.cost,desc:parts.join(' + '),g:best.nb*L.q+(ps.length>1?best.ns*s.q:0)};
+}
+function resolve(ing,blocked,dis,soft){
+ const out={},notes=[];
+ for(const [id,g] of Object.entries(ing)){
+  let use=id;const bad=x=>IT[x].tags.some(t=>blocked.has(t));
+  if(bad(use))use=(SUBS[id]||[]).find(s=>!bad(s)&&!dis.has(s))||null;
+  if(use&&dis.has(use))use=null;
+  if(!use){if(soft||g<=MINOR){notes.push('sem '+IT[id].n.toLowerCase());continue}return null}
+  if(use!==id)notes.push(IT[use].n.toLowerCase()+' no lugar de '+IT[id].n.toLowerCase());
+  out[use]=(out[use]||0)+g;
+ }
+ return{ing:out,notes};
+}
+// Proteína, carboidrato e gordura (g por 100 g), valores aproximados da tabela TACO/USDA
+const MAC={tomate:[1.1,3.1,.2],cebola:[1.7,8.9,.1],alho:[7,24,.2],cenoura:[1.3,7.7,.2],batata:[1.8,14.7,0],batata_doce:[1.3,28,.1],mandioca:[1.1,36,.3],abobrinha:[1.1,3,.2],pimentao:[1.1,5,.2],repolho:[1.4,4.5,.1],pepino:[.9,2,0],abacate:[1.2,6,8.4],limao:[.9,11,.1],banana:[1.4,24,.1],maca:[.3,15,0],laranja:[1,11,.1],gengibre:[1.8,18,.8],alface:[1.4,2.4,.2],brocolis:[3.6,4,.3],cheiro:[3,5,.5],coentro:[2.1,4,.5],
+ frango:[32,0,2.5],carne_moida:[26,0,12],linguica:[16,0,26],salmao:[20,0,13],tilapia:[26,0,3],camarao:[20,0,1],atum:[26,0,8],ovos:[13,1.1,9.5],tofu:[8.5,2,4.5],
+ leite:[3.2,4.7,3.2],leite_sl:[3.2,4.7,3.2],leite_veg:[3,2,1.8],queijo:[23,3,25],manteiga:[.4,0,82],creme_leite:[2.2,4.5,20],creme_leite_sl:[2.2,4.5,20],iogurte:[4,5.5,3],
+ arroz:[7.2,79,.3],arroz_jp:[6.5,79,.5],feijao:[20,61,1.3],feijao_preto:[21,58,1.3],lentilha:[23,62,.8],grao:[21,61,5.4],macarrao:[12,73,2],macarrao_arroz:[6,80,.6],tortilla:[8,50,7],tortilla_milho:[5.7,45,2.8],pipoca:[10,70,4],pao:[9,49,3],tapioca:[.2,60,0],biscoito:[10,68,14],
+ oleo:[0,0,100],azeite:[0,0,100],acucar:[0,100,0],molho_tomate:[1.3,7,.5],milho:[3,17,1],shoyu:[8,5,0],shoyu_sg:[8,5,0],leite_coco:[1.8,3,18],amendoim:[26,16,49]};
+const PMSET=new Set(['frango','carne_moida','linguica','salmao','tilapia','camarao','atum','ovos','tofu','queijo','iogurte']);
+const macOf=(ing,f=()=>1)=>Object.entries(ing).reduce((a,[id,g])=>{const m=MAC[id]||[0,0,0];return a.map((v,k)=>v+m[k]*g*f(id)/100)},[0,0,0]);
+const pmKc=ing=>Object.entries(ing).reduce((s,[id,g])=>s+(PMSET.has(id)?IT[id].kcal*g/100:0),0);
+const BASEF=new Set([...COOK_BASE]);
+const baseKc=ing=>Object.entries(ing).reduce((s,[id,g])=>s+(BASEF.has(id)?IT[id].kcal*g/100:0),0);
+const fq=id=>!plan?1:BASEF.has(id)?plan.bm:PMSET.has(id)?plan.pm:1;
+const kcalOf=ing=>Object.entries(ing).reduce((s,[id,g])=>s+IT[id].kcal*g/100,0);
+const costOf=ing=>Object.entries(ing).reduce((s,[id,g])=>s+ppg(id)*g,0);
+const PROT=new Set(['frango','carne_moida','linguica','salmao','tilapia','camarao','atum','ovos','tofu','lentilha','grao','feijao_preto','feijao','queijo','abacate']);
+const mainOf=r=>Object.entries(r.ing).filter(([id])=>!PANTRYISH.has(id)).sort((a,b)=>PROT.has(b[0])-PROT.has(a[0])).filter((e,i,a)=>!PROT.has(a[0][0])||PROT.has(e[0])).sort((a,b)=>ppg(b[0])*b[1]-ppg(a[0])*a[1])[0][0];
+const overlap=(r,set)=>Object.keys(r.ing).filter(id=>!PANTRYISH.has(id)&&set.has(id)).length;
+
+function build(){
+ const blocked=new Set(st.restr.flatMap(r=>RESTR.find(x=>x[0]===r)[2])),dis=new Set(st.dis);
+ const P=st.people,D=st.days,target=+st.kcal||2000,rnd=rng(seed);
+ const cands=RECIPES.filter(r=>!st.bad.includes(r.id)).map(r=>{const x=resolve(r.ing,blocked,dis);return x&&{...r,...x}}).filter(Boolean);
+ if(!cands.length)return{error:'Nenhuma receita da nossa base combina com essas restrições e ingredientes evitados. Tente tirar algum ingrediente da lista de “não gosto”.'};
+ cands.forEach(r=>{r.cps=costOf(r.ing);r.kc=kcalOf(r.ing);r.main=mainOf(r);r.pd=macOf(r.ing)[0]*4/Math.max(1,r.kc);r.score=(st.prot?r.pd*12*st.prot:0)+(st.cuis.includes(r.c)?3:0)+(st.fav.includes(r.id)?2.5:0)+rnd()*1.5});
+ const bf=st.bf?resolve(BREAKFAST,blocked,dis,true):null;
+ // Com almoço e jantar, o jantar de hoje rende o almoço de amanhã (cozinha 1 vez, come 2)
+ const all=[];for(let d=0;d<D;d++){const wd=new Date(Date.now()+d*864e5).getDay();if(st.mpd===2)all.push({d,wd,k:'Almoço'},{d,wd,k:'Jantar'});else all.push({d,wd,k:'Jantar'})}
+ // Refeições fora: primeiro almoços de segunda a sexta (trabalho), depois jantares de sexta e sábado, depois o resto
+ const prio=m=>(m.k==='Almoço'&&m.wd>=1&&m.wd<=5)?0:(m.k==='Jantar'&&(m.wd===5||m.wd===6))?1:2;
+ for(let w=0;w*7<D;w++){const wk=all.filter(m=>m.d>=w*7&&m.d<w*7+7),n=Math.min(wk.length,Math.round(st.out*wk.filter(m=>m.k==='Jantar').length/7));
+  wk.map((m,i)=>[prio(m),i,m]).sort((a,b)=>a[0]-b[0]||a[1]-b[1]).slice(0,n).forEach(x=>x[2].out=true)}
+ const meals=all.filter(m=>!m.out);
+ if(!meals.length)return{error:'Com todas as refeições fora de casa, não sobra nada para cozinhar. Diminua as refeições fora.'};
+ // Quantas refeições cada preparo rende: refeições em casa por semana ÷ vezes que cozinha (até 4 sem congelar)
+ const perWeek=meals.length/(D/7),bsRaw=Math.max(1,Math.round(perWeek/st.cook)),bs=st.marmita?bsRaw:Math.min(4,bsRaw);
+ const off=st.mpd===2&&bs===2&&!st.out?1:0; // padrão: o jantar rende o almoço do dia seguinte
+ meals.forEach((m,i)=>m.b=Math.floor((i+off)/bs));
+ const snacks=[];const sOk=SNACKS.map(([n,ing])=>{const x=resolve(ing,blocked,dis);return x&&Object.keys(x.ing).length?{n,...x}:null}).filter(Boolean);
+ if(st.prot)sOk.sort((a,b)=>macOf(b.ing)[0]/Math.max(1,kcalOf(b.ing))-macOf(a.ing)[0]/Math.max(1,kcalOf(a.ing)));
+ for(let d=0;d<D;d++){snacks[d]=[];for(let j=0;j<st.snk&&sOk.length;j++)snacks[d].push(sOk[(d*st.snk+j)%sOk.length])}
+ const tHome=Math.max(800,target-all.filter(m=>m.out).length*OUT_KCAL/D);
+ const nb=meals[meals.length-1].b+1,k=Math.min(cands.length,Math.max(3,Math.min(12,Math.ceil(nb*.75))));
+ // Aproveitamento total: cada nova receita ganha pontos por reaproveitar ingredientes das já escolhidas
+ const ingSet=arr=>new Set(arr.flatMap(r=>Object.keys(r.ing)));
+ const fit=(c,arr)=>c.score+Math.min(2.4,.6*overlap(c,ingSet(arr)));
+ let chosen=[];while(chosen.length<k){const pool=cands.filter(c=>!chosen.includes(c));chosen.push(pool.reduce((a,b)=>fit(b,chosen)>fit(a,chosen)?b:a))}
+ const pantry=st.pantry;
+ const evalWith=arr=>{
+  // Meta de calorias: ajusta só a base do prato (arroz, feijão, massa, pão, batata, banana), que é a caloria mais barata
+  const snK=snacks.flat().reduce((s,x)=>s+kcalOf(x.ing),0)/D;
+  const allIng=[...meals.map(m=>arr[m.b%arr.length].ing),...(bf?Array(D).fill(bf.ing):[]),...snacks.flat().map(x=>x.ing)];
+  const sumD=f=>allIng.reduce((s,ing)=>s+f(ing),0)/D;
+  // Meta de proteína: aumenta carnes, ovos, peixe, tofu e laticínios até chegar perto da meta (máx. o dobro)
+  const prot0=sumD(i=>macOf(i)[0]),protPM=sumD(i=>macOf(i,id=>PMSET.has(id)?1:0)[0]),tgtP=st.prot?tHome*(st.prot===1?.22:.30)/4:0;
+  const pm=st.prot&&protPM>0?Math.min(2,Math.max(1,1+(tgtP-prot0)/protPM)):1;
+  const dayK=sumD(kcalOf)+sumD(pmKc)*(pm-1),baseK=sumD(baseKc);
+  const bm=baseK>0?Math.min(2.5,Math.max(.5,(baseK+tHome-dayK)/baseK)):1,fx=id=>BASEF.has(id)?bm:PMSET.has(id)?pm:1;
+  const macD=[0,1,2].map(k=>sumD(i=>macOf(i,fx)[k]));
+  const need={},uses={};const add=(ing,mult,rid)=>{for(const [id,g] of Object.entries(ing)){need[id]=(need[id]||0)+g*mult*fx(id);if(rid!=null)(uses[id]=uses[id]||new Set()).add(rid)}};
+  meals.forEach(m=>add(arr[m.b%arr.length].ing,P,arr[m.b%arr.length].id));
+  if(bf)add(bf.ing,P*D,null);
+  snacks.flat().forEach(x=>add(x.ing,P,null));
+  const items=[],home=[];
+  for(const [id,g] of Object.entries(need)){
+   const have=id in pantry?(pantry[id]==null?Infinity:pantry[id]):0,left=Math.max(0,g-have);
+   if(left<=1e-6){home.push({id,need:g});continue}
+   items.push({id,need:left,total:g,have:Math.min(have,g),uses:uses[id]?uses[id].size:0,...buy(id,left)});
+  }
+  const cost=items.reduce((s,i)=>s+i.cost,0),used=items.reduce((s,i)=>s+ppg(i.id)*i.need,0);
+  return{items,home,cost,used,bm,pm,macD,tgtP,tHome,kcal:Math.round(dayK+baseK*(bm-1))};
+ };
+ let res=evalWith(chosen),guard=0;
+ while(res.cost>st.budget&&guard++<300){
+  const worst=chosen.reduce((a,b)=>b.cps>a.cps?b:a),rest=chosen.filter(c=>c!==worst);
+  const opts=cands.filter(c=>!chosen.includes(c)&&c.cps<worst.cps-1e-6);
+  if(opts.length){const pick=opts.reduce((a,b)=>(fit(b,rest)-.5*b.cps)>(fit(a,rest)-.5*a.cps)?b:a);chosen[chosen.indexOf(worst)]=pick}
+  else if(chosen.length>Math.min(3,cands.length))chosen.splice(chosen.indexOf(worst),1);else break;
+  res=evalWith(chosen);
+ }
+ return{cands,chosen,meals,all,snacks,bs,bsRaw,bf,evalWith,res};
+}
+function finalize(p){
+ p.res=p.evalWith(p.chosen);
+ p.meals.forEach(m=>m.r=p.chosen[m.b%p.chosen.length]);
+ p.batches=[];p.meals.forEach(m=>(p.batches[m.b]=p.batches[m.b]||[]).push(m));
+ p.bm=p.res.bm;p.pm=p.res.pm;p.kcal=p.res.kcal;p.distinct=new Set(p.meals.map(m=>m.r.id)).size;
+ // Trocas inteligentes: para cada receita, a troca que mais economiza na compra inteira
+ const best=[];
+ p.chosen.forEach((r,i)=>{let top=null;
+  p.cands.filter(c=>!p.chosen.includes(c)&&!st.bad.includes(c.id)).forEach(c=>{const arr=[...p.chosen];arr[i]=c;const sv=p.res.cost-p.evalWith(arr).cost;if(sv>=3&&(!top||sv>top.sv))top={i,from:r,to:c,sv}});
+  if(top)best.push(top)});
+ p.swaps=best.sort((a,b)=>b.sv-a.sv).slice(0,3);
+ return p;
+}
+
+// ---------- navegação ----------
+let view='plan';
+function show(v){if(v==='plan'&&view!=='plan')wshow(-1);view=v;['plan','menu','list','prices'].forEach(x=>$('#v-'+x).hidden=x!==v);
+ document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+ if(v==='prices')renderPrices();if(v==='list')renderList();scrollTo(0,0)}
+document.querySelector('nav').onclick=e=>{const b=e.target.closest('button');if(b&&!b.disabled)show(b.dataset.v)};
+
+function summary(){
+ const {res}=plan,over=res.cost>st.budget,pct=Math.min(100,res.cost/Math.max(1,st.budget)*100),per=res.cost/(st.people*st.days);
+ const aprov=res.cost?Math.round(res.used/res.cost*100):100;
+ return`<div class="card sum"><div class="of">Compra estimada para ${st.people} ${st.people>1?'pessoas':'pessoa'}, ${st.days} dias</div>
+ <div class="big">${R$(res.cost)}</div><div class="of">de ${R$(+st.budget)} de orçamento</div>
+ <div class="meter ${over?'over':''}"><i style="width:${pct}%"></i></div>
+ <div class="stats"><div><b>${R$(per)}</b><small>pessoa/dia</small></div><div><b>${plan.kcal.toLocaleString('pt-BR')}</b><small>kcal pessoa/dia${st.out?' em casa':''}</small></div><div><b>${aprov}%</b><small>aproveitado</small></div></div></div>
+ ${over?`<div class="card warn"><b>O orçamento não fecha.</b> Mesmo com as receitas mais baratas que combinam com você, a compra fica ${R$(res.cost-st.budget)} acima. Tente menos dias ou só uma refeição por dia${plan.swaps&&plan.swaps.length?' ou veja as trocas abaixo':''}.</div>`
+ :`<div class="card ok">Sobram <b>${R$(st.budget-res.cost)}</b> para frutas, lanches ou temperos. ${aprov}% do que você compra vira refeição neste período; o resto (sobras de pacote de sal, óleo, arroz…) fica para a próxima compra.</div>`}
+ ${plan.bsRaw>plan.bs?`<div class="card tip">Cozinhando ${st.cook===2?'1 a 2':'3 a 4'} vezes por semana, cada preparo teria que durar mais de 4 dias. Limitei a 4 refeições por preparo; ative o <b>modo marmita</b> para congelar e cozinhar menos vezes.</div>`:''}
+ ${res.home.length?`<p class="hint" style="margin:-4px 0 12px">Você já tem em casa: ${esc(res.home.map(h=>IT[h.id].n).join(', '))}. Não entrou na conta.</p>`:''}`;
+}
+function renderMenu(){
+ const days=[];plan.all.forEach(m=>(days[m.d]=days[m.d]||[]).push(m));
+ const wd=['dom','seg','ter','qua','qui','sex','sáb'],t0=new Date();
+ const swaps=plan.swaps.length?`<div class="card tip"><h2>Trocas que economizam</h2>${plan.swaps.map((s,j)=>`<div class="swap"><p>Troque <b>${esc(s.from.n)}</b> (${esc(IT[s.from.main].n.toLowerCase())}) por <b>${esc(s.to.n)}</b> (${esc(IT[s.to.main].n.toLowerCase())}) e economize <b class="s">${R$(s.sv)}</b></p><button class="btn sm alt" data-sw="${j}">Trocar</button></div>`).join('')}</div>`:'';
+ let prep='';
+ if(st.marmita){
+  const weeks=[];for(let w=0;w*7<st.days;w++)weeks.push(w);
+  prep=weeks.map(w=>{const ms=plan.meals.filter(m=>m.d>=w*7&&m.d<w*7+7);const by=new Map();ms.forEach(m=>by.set(m.r,(by.get(m.r)||0)+st.people));
+   const tot={};by.forEach((n,r)=>{for(const [id,g] of Object.entries(r.ing))tot[id]=(tot[id]||0)+g*n*fq(id)});
+   const cook=COOK.filter(id=>tot[id]).map(id=>`Cozinhe ${W(tot[id])} de ${IT[id].n.toLowerCase()} (peso cru)`);
+   const chop=CHOP.filter(id=>tot[id]).map(id=>`${W(tot[id])} de ${IT[id].n.toLowerCase()}`);
+   const dt=new Date(t0.getTime()+w*7*864e5);
+   return`<div class="card tip"><h2>Dia de preparo ${weeks.length>1?w+1:''} · ${wd[dt.getDay()]}, ${dt.getDate()}/${dt.getMonth()+1}</h2>
+   <p style="margin-top:0">${ms.length*st.people} marmitas. Guarde na geladeira as dos 3 primeiros dias e congele o resto; descongele na geladeira na véspera.</p>
+   <ol class="prep">${cook.map(t=>`<li>${esc(t)}</li>`).join('')}${chop.length?`<li>Lave e pique de uma vez: ${esc(chop.join(', '))}</li>`:''}
+   ${[...by].map(([r,n])=>`<li>Prepare ${esc(r.n)}: ${n} porções</li>`).join('')}<li>Monte as marmitas e etiquete com o dia</li></ol></div>`}).join('');
+ }
+ const toast=plan.toast?`<div class="card ok swap" style="border-top:0"><p>Trocamos <b>${esc(plan.toast.from.n)}</b> por <b>${esc(plan.toast.to.n)}</b>. A lista de compras já foi atualizada.</p><button class="btn sm alt" id="undo">Desfazer</button></div>`:'';
+ const md=plan.res.macD,kc=plan.kcal,pc=x=>Math.round(x/Math.max(1,kc)*100),tP=Math.round(plan.res.tgtP||plan.res.tHome*.15/4);
+ const nut=`<div class="card"><h2>Nutrição por pessoa por dia</h2>
+ <table class="tn"><thead><tr><th></th><th>No plano</th><th>Meta</th></tr></thead><tbody>
+ <tr><td>Calorias</td><td>${kc.toLocaleString('pt-BR')} kcal</td><td>${Math.round(plan.res.tHome).toLocaleString('pt-BR')} kcal</td></tr>
+ <tr><td>Proteína</td><td>${Math.round(md[0])} g <small>(${pc(md[0]*4)}%)</small></td><td>${st.prot?'':'cerca de '}${tP} g</td></tr>
+ <tr><td>Carboidratos</td><td>${Math.round(md[1])} g <small>(${pc(md[1]*4)}%)</small></td><td>45 a 65%</td></tr>
+ <tr><td>Gorduras</td><td>${Math.round(md[2])} g <small>(${pc(md[2]*9)}%)</small></td><td>20 a 35%</td></tr></tbody></table>
+ ${st.prot&&md[0]<tP*.9?`<p class="card warn" style="margin:12px 0 0">Ficou ${tP-Math.round(md[0])} g abaixo da meta de proteína. ${plan.res.cost>=st.budget*.97?'O orçamento não deixou ir além: aumente o valor ou reduza os dias.':''}${st.restr.includes('vegano')||st.restr.includes('veg')?' Para quem não come carne, tofu, lentilha e grão-de-bico são as fontes mais baratas.':''}</p>`:''}
+ <span class="l" style="margin-top:14px">Quer mais proteína?</span>
+ <div class="seg" id="protSeg">${[[0,'Normal'],[1,'Mais'],[2,'Bem mais']].map(([v,l])=>`<button data-v="${v}" class="${st.prot===v?'on':''}">${l}</button>`).join('')}</div>
+ <p class="hint">Valores aproximados (tabela TACO), só das refeições feitas em casa. "Mais" busca 22% das calorias em proteína e "Bem mais", 30%: o app prioriza receitas mais proteicas e aumenta carnes, ovos, peixe, tofu ou laticínios, até o dobro.</p></div>`;
+ $('#v-menu').innerHTML=`<h1>Seu cardápio</h1>${toast}${summary()}${nut}${swaps}
+ <div class="row" style="margin-bottom:12px"><button class="btn alt" id="again">Outra combinação</button></div>${prep}
+ ${days.map((ms,d)=>{const dt=new Date(t0.getTime()+d*864e5);return`<div class="card day"><h2>Dia ${d+1}<small>${wd[dt.getDay()]}, ${dt.getDate()}/${dt.getMonth()+1}</small></h2>
+ ${plan.bf?`<div class="meal" style="cursor:default"><span class="k">Café</span><span class="n" style="font-weight:400">${esc(Object.keys(plan.bf.ing).filter(i=>!['cafe','manteiga','oleo'].includes(i)).map(i=>IT[i].n).join(', '))}${plan.bf.ing.cafe?' e café':''}</span></div>`:''}
+ ${plan.snacks[d]&&plan.snacks[d].length?`<div class="meal" style="cursor:default"><span class="k">Lanche</span><span class="n" style="font-weight:400">${esc(plan.snacks[d].map(x=>x.n).join(' e '))}</span></div>`:''}
+ ${ms.map(m=>{if(m.out)return`<div class="meal" style="cursor:default"><span class="k">${m.k}</span><span class="n tag" style="font-size:15px">Fora de casa</span></div>`;
+  const b=plan.batches[m.b],first=b[0]===m,dw=d%7,src=b[0];
+  const tag=st.marmita?(dw<3?'Marmita da geladeira':'Marmita congelada: descongele na véspera'):(first?(b.length>1?`Cozinhar: rende ${b.length} refeições`:'Cozinhar'):`Sobra ${src.d===m.d?'do almoço':src.d===m.d-1?'de ontem':'do dia '+(src.d+1)}`);
+  return`<button class="meal" data-b="${m.b}"><span class="k">${m.k}</span><span class="n">${esc(m.r.n)}<br><span class="tag">${tag}</span></span><span class="cz">${esc(m.r.c)}</span></button>`}).join('')}</div>`}).join('')}
+ ${RECIPES.length-plan.cands.length?`<p class="hint">${RECIPES.length-plan.cands.length} de ${RECIPES.length} receitas da base ficaram de fora por causa das suas restrições ou do que você não gosta.</p>`:''}`;
+ $('#again').onclick=()=>{seed++;run(false)};
+ $('#protSeg').onclick=e=>{const b=e.target.closest('button');if(b&&+b.dataset.v!==st.prot){st.prot=+b.dataset.v;save();renderForm();run(false)}};
+ const u=$('#undo');if(u)u.onclick=()=>{const tt=plan.toast;st.bad=st.bad.filter(x=>x!==tt.from.id);save();plan.chosen[tt.i]=tt.from;plan.toast=null;finalize(plan);renderMenu()};
+ $('#v-menu').querySelectorAll('.meal[data-b]').forEach(b=>b.onclick=()=>openRecipe(+b.dataset.b));
+ $('#v-menu').querySelectorAll('[data-sw]').forEach(b=>b.onclick=()=>{const s=plan.swaps[+b.dataset.sw];plan.chosen[s.i]=s.to;plan.toast=null;finalize(plan);renderMenu();renderList()});
+}
+function openRecipe(bi){
+ const b=plan.batches[bi],r=b[0].r,serv=st.people*b.length,mult=serv,rk=Math.round(kcalOf(Object.fromEntries(Object.entries(r.ing).map(([id,g])=>[id,g*fq(id)])))),rm=macOf(r.ing,fq),rc=Object.entries(r.ing).reduce((s,[id,g])=>s+ppg(id)*g*fq(id),0)*serv;
+ const others=plan.chosen.filter(c=>c!==r),shared=Object.keys(r.ing).filter(id=>!PANTRYISH.has(id)&&others.some(o=>id in o.ing));
+ openSheet(`<span class="cz">${esc(r.c)}</span><h1 style="margin-top:10px">${esc(r.n)}</h1>
+ <p class="hint">Rende ${serv} ${serv>1?'porções':'porção'}${b.length>1&&!st.marmita?` (${b.length} refeições)`:''} · cerca de ${rk} kcal por porção · ${R$(rc)} em ingredientes</p>
+ <div class="nut"><div><b>${rk}</b><small>kcal</small></div><div><b>${Math.round(rm[0])} g</b><small>proteína</small></div><div><b>${Math.round(rm[1])} g</b><small>carboidratos</small></div><div><b>${Math.round(rm[2])} g</b><small>gorduras</small></div></div><p class="hint" style="margin:-4px 0 12px">Por porção.</p>
+ <h2>Ingredientes</h2><ul>${Object.entries(r.ing).map(([id,g])=>`<li>${esc(IT[id].n)}: ${Q(id,g*mult*fq(id))}</li>`).join('')}</ul>
+ ${shared.length?`<p class="card ok" style="margin:0 0 12px">Aproveitamento: ${esc(shared.map(id=>IT[id].n.toLowerCase()).join(', '))} também ${shared.length>1?'aparecem':'aparece'} em outras receitas da semana, então nada se perde.</p>`:''}
+ ${r.notes.length?`<p class="card tip" style="margin:0 0 12px">Adaptada para você: ${esc(r.notes.join('; '))}.</p>`:''}
+ <h2>Modo de preparo</h2><p>${esc(r.s)}</p>
+ <div class="row" style="margin-top:16px"><button class="btn alt" id="rBad">Não gostei, trocar</button><button class="btn ${st.fav.includes(r.id)?'':'alt'}" id="rFav" aria-pressed="${st.fav.includes(r.id)}">${st.fav.includes(r.id)?'Nas favoritas':'Favoritar'}</button></div>
+ <p class="hint" id="rMsg" aria-live="polite">Receitas que você não gostar não voltam mais. As favoritas aparecem com mais frequência.</p>`);
+ $('#rBad').onclick=()=>dislike(r);
+ $('#rFav').onclick=()=>{const i=st.fav.indexOf(r.id);i<0?st.fav.push(r.id):st.fav.splice(i,1);save();openRecipe(bi)};
+}
+function dislike(r){
+ const i=plan.chosen.indexOf(r);if(!st.bad.includes(r.id))st.bad.push(r.id);st.fav=st.fav.filter(x=>x!==r.id);save();
+ const pool=plan.cands.filter(c=>!plan.chosen.includes(c)&&!st.bad.includes(c.id));
+ if(!pool.length){$('#rMsg').textContent='Não sobrou outra receita compatível com suas escolhas. Ela não volta nos próximos planos.';return}
+ const opts=pool.map(c=>{const a=[...plan.chosen];a[i]=c;return{c,cost:plan.evalWith(a).cost}});
+ const fits=opts.filter(o=>o.cost<=st.budget),pick=(fits.length?fits.reduce((a,b)=>b.c.score>a.c.score?b:a):opts.reduce((a,b)=>b.cost<a.cost?b:a)).c;
+ plan.chosen[i]=pick;finalize(plan);plan.toast={from:r,to:pick,i};closeOv();renderMenu();scrollTo(0,0);
+}
+function openSheet(html){$('#sheet').innerHTML=`<button class="x" id="cls" aria-label="Fechar">×</button>`+html;$('#ov').hidden=false;$('#cls').focus();$('#cls').onclick=closeOv}
+const closeOv=()=>{$('#ov').hidden=true};
+$('#ov').onclick=e=>{if(e.target.id==='ov')closeOv()};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOv()});
+
+// ---------- lista (minha ou da família) ----------
+let checked=new Set(ls.get('cesta.check',[])),listMode='mine',fam=null,famRef=null,user=null,uid=null,canWrite=true,famMsg='',writeQ=Promise.resolve();
+const curList=()=>listMode==='fam'&&fam?{items:fam.items||[],total:fam.total||0,isFam:true}:plan?{items:plan.res.items,total:plan.res.cost,isFam:false}:null;
+const isChecked=(L,id)=>L.isFam?!!(fam.checked&&fam.checked[id]):checked.has(id);
+let cart=ls.get('cesta.cart',{});
+function cartSum(L){
+ const on=L.items.filter(i=>isChecked(L,i.id)),off=L.items.filter(i=>!isChecked(L,i.id));
+ const inCart=on.reduce((s,i)=>s+(cart[i.id]!=null?cart[i.id]:i.cost),0),left=off.reduce((s,i)=>s+i.cost,0),real=on.filter(i=>cart[i.id]!=null).length;
+ const bud=+st.budget||0,proj=inCart+left,over=proj>bud&&bud>0,pct=bud?Math.min(100,inCart/bud*100):0;
+ return`<div class="card sum"><div class="of">${L.isFam?'Lista da família':'Sua lista'} · ${on.length} de ${L.items.length} no carrinho${real?` · ${real} com preço real`:''}</div>
+ <div class="big">${R$(inCart)}</div><div class="of">no carrinho agora · ${bud?`restam ${R$(Math.max(0,bud-inCart))} do orçamento de ${R$(bud)}`:''}</div>
+ <div class="meter ${over?'over':''}"><i style="width:${pct}%"></i></div>
+ <div class="of">Falta pegar cerca de ${R$(left)}. Previsão do total: <b>${R$(proj)}</b></div></div>
+ ${over?`<div class="card warn"><b>Vai estourar ${R$(proj-bud)}.</b> Com os preços de hoje, a compra passa do orçamento. Dá para trocar marcas, deixar lanches para depois ou usar as trocas do cardápio.</div>`:on.length?`<div class="card ok">Dentro do orçamento: sobram cerca de ${R$(bud-proj)} no fim da compra.</div>`:''}`;
+}
+function cartBar(L){const on=L.items.filter(i=>isChecked(L,i.id)),inCart=on.reduce((s,i)=>s+(cart[i.id]!=null?cart[i.id]:i.cost),0),proj=inCart+L.items.filter(i=>!isChecked(L,i.id)).reduce((s,i)=>s+i.cost,0),bud=+st.budget||0;
+ return`<span>Carrinho <b>${R$(inCart)}</b></span><span class="${proj>bud?'bad':''}">${proj>bud?'Estoura '+R$(proj-bud):'Sobra '+R$(bud-proj)}</span>`}
+function renderList(){
+ const L=curList();if(!L){$('#v-list').innerHTML='<h1>Lista de compras</h1><div class="card">Gere um cardápio primeiro.</div>';return}
+ const left=L.items.filter(i=>!isChecked(L,i.id)).reduce((s,i)=>s+i.cost,0),done=L.items.length-L.items.filter(i=>!isChecked(L,i.id)).length;
+ const seg=fam&&plan?`<div class="seg" id="lmode" style="margin-bottom:12px"><button data-m="fam" class="${listMode==='fam'?'on':''}">Lista da família</button><button data-m="mine" class="${listMode==='mine'?'on':''}">Minha lista nova</button></div>`:'';
+ const shareCard=famRef?(L.isFam?`<div class="card ok">Lista compartilhada: quem tem acesso a este app vê os mesmos itens e os checks na hora.${famMsg?'<br><b>'+esc(famMsg)+'</b>':''}</div>`
+  :`<div class="card"><h2>Fazer a compra junto com a família</h2><p class="hint" style="margin:0 0 10px">Compartilhe esta lista: quem abrir o app vê os itens por corredor e o check de cada um na hora.${fam?' Isso substitui a lista da família atual.':''}</p><button class="btn" id="share">Compartilhar com a família</button>${famMsg?`<p class="hint">${esc(famMsg)}</p>`:''}</div>`)
+  :'';
+ let n=0;
+ $('#v-list').innerHTML=`<h1>Lista de compras</h1>${seg}
+ <div id="cartSum">${cartSum(L)}</div><div class="cbar" id="cartBar">${cartBar(L)}</div>
+ ${shareCard}
+ ${CATS.map(c=>{const its=L.items.filter(i=>IT[i.id]&&IT[i.id].cat===c).sort((a,b)=>IT[a.id].n.localeCompare(IT[b.id].n));if(!its.length)return'';n++;
+ return`<div class="card"><h2>Corredor ${n} · ${c}</h2>${its.map(i=>{const on=isChecked(L,i.id),by=L.isFam&&fam.checked?fam.checked[i.id]:null;
+  return`<label class="li ${on?'done':''}"><input type="checkbox" data-id="${esc(i.id)}" ${on?'checked':''}><span class="d">${esc(IT[i.id].n)}<small>${esc(i.desc)}${i.need?' · usa '+Q(i.id,i.need):''}${i.uses>1?' · em '+i.uses+' receitas':''}${i.have?' · já tem '+Q(i.id,i.have):''}</small>${on&&typeof by==='string'?`<span class="who" data-u="${esc(by)}"></span>`:''}</span><span class="p">${R$(i.cost)}</span></label>${on?`<div class="paid"><label for="pd-${esc(i.id)}">Quanto pagou neste item</label><span>R$</span><input id="pd-${esc(i.id)}" type="number" inputmode="decimal" step="0.01" min="0" data-paid="${esc(i.id)}" data-est="${i.cost}" value="${cart[i.id]!=null?cart[i.id]:''}" placeholder="${i.cost.toFixed(2)}"></div>`:''}`}).join('')}</div>`}).join('')}
+ <div class="row" style="margin-bottom:12px"><button class="btn alt" id="copy">Copiar lista em texto</button></div><p class="hint" id="copyMsg" aria-live="polite"></p>
+ <div class="card"><h2>Terminou a compra?</h2><p class="hint" style="margin:0 0 10px">Leia o QR Code da nota fiscal para registrar quanto gastou de verdade e ajustar os preços médios.</p>
+ <div class="row"><label class="btn file">Ler QR Code da nota<input type="file" accept="image/*" capture="environment" id="qrFile"></label></div>
+ <div class="add"><input id="qrTxt" type="url" placeholder="ou cole o link do QR Code" aria-label="Link do QR Code da nota"><button class="btn alt" id="qrGo">Ler</button></div><p class="hint" id="qrMsg" aria-live="polite"></p>${points()}</div>
+ ${history()}`;
+ $('#v-list').querySelectorAll('input[data-id]').forEach(c=>c.onchange=()=>toggleItem(L,c.dataset.id,c.checked));
+ $('#v-list').querySelectorAll('input[data-paid]').forEach(inp=>{
+  inp.oninput=()=>{const v=parseFloat(inp.value);if(v>=0&&inp.value!=='')cart[inp.dataset.paid]=v;else delete cart[inp.dataset.paid];ls.set('cesta.cart',cart);$('#cartSum').innerHTML=cartSum(L);$('#cartBar').innerHTML=cartBar(L)};
+  inp.onchange=()=>{const id=inp.dataset.paid,e=+inp.dataset.est,cob=ls.get('cesta.cartobs',{});if(cart[id]>0&&e>0)cob[id]=+(cart[id]/e).toFixed(3);else delete cob[id];ls.set('cesta.cartobs',cob);applyPrices()};
+ });
+ const lm=$('#lmode');if(lm)lm.onclick=e=>{const b=e.target.closest('button');if(b){listMode=b.dataset.m;renderList()}};
+ const sh=$('#share');if(sh)sh.onclick=shareFam;
+ $('#copy').onclick=async()=>{const txt=`Lista de compras\n`+CATS.map(c=>{const its=L.items.filter(i=>IT[i.id].cat===c);return its.length?`\n${c}\n`+its.map(i=>`${isChecked(L,i.id)?'[x]':'[ ]'} ${IT[i.id].n}: ${i.desc} (${R$(i.cost)})`).join('\n'):''}).join('')+`\n\nTotal estimado: ${R$(L.total)}`;
+  try{await navigator.clipboard.writeText(txt);$('#copyMsg').textContent='Lista copiada. Cole no WhatsApp ou nas notas.'}catch(e){$('#copyMsg').textContent='Não consegui copiar neste navegador.'}};
+ $('#qrFile').onchange=e=>{const f=e.target.files[0];if(f)readQrImage(f)};
+ $('#qrGo').onclick=()=>parseNota($('#qrTxt').value);
+ fillNames();
+}
+async function fillNames(){if(!user)return;const els=[...document.querySelectorAll('.who[data-u]')];if(!els.length)return;
+ try{const ps=await user.profiles([...new Set(els.map(e=>e.dataset.u))]);els.forEach(e=>{const p=ps&&ps[e.dataset.u];e.textContent='pego por '+((p&&p.name)||'alguém da família')})}catch(e){}}
+function toggleItem(L,id,on){
+ if(!L.isFam){on?checked.add(id):checked.delete(id);ls.set('cesta.check',[...checked]);renderList();return}
+ if(!canWrite){renderList();return}
+ writeQ=writeQ.then(()=>famRef.update({checked:{[id]:on?(uid||true):false}})).catch(e=>{if(e&&e.code==='invalid_argument'){canWrite=false;famMsg='Você só pode ver esta lista; peça acesso de edição a quem compartilhou.'}renderList()});
+}
+async function shareFam(){
+ if(!plan||!famRef)return;
+ const items=plan.res.items.map(i=>({id:i.id,desc:i.desc,cost:+i.cost.toFixed(2),need:Math.round(i.need),uses:i.uses}));
+ try{await famRef.set({items,total:+plan.res.cost.toFixed(2),people:st.people,days:st.days,by:uid||'',at:Date.now(),checked:{}});listMode='fam';famMsg=''}
+ catch(e){famMsg=e&&e.code==='invalid_argument'?'Você não tem permissão para compartilhar aqui.':'Não deu para compartilhar agora. Tente de novo.'}
+ renderList();
+}
+(async()=>{
+ if(!window.claude||!claude.use)return;
+ try{user=await claude.use('user');const db=await claude.use('db');if(!db)return;
+  if(user){try{uid=await user.id()}catch(e){}}
+  famRef=db.doc('listas/familia');
+  famRef.onSnapshot(s=>{fam=s.exists?s.data():null;if(fam&&!plan)listMode='fam';if(fam){document.querySelector('nav [data-v=list]').disabled=false}if(view==='list')renderList()},()=>{});
+  if(view==='list')renderList();
+ }catch(e){}
+})();
+
+// ---------- nota fiscal (NFC-e) ----------
+const UF={11:'RO',12:'AC',13:'AM',14:'RR',15:'PA',16:'AP',17:'TO',21:'MA',22:'PI',23:'CE',24:'RN',25:'PB',26:'PE',27:'AL',28:'SE',29:'BA',31:'MG',32:'ES',33:'RJ',35:'SP',41:'PR',42:'SC',43:'RS',50:'MS',51:'MT',52:'GO',53:'DF'};
+let jsqrP=null;
+const loadJsQR=()=>jsqrP||(jsqrP=new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';s.onload=()=>ok(window.jsQR);s.onerror=no;document.head.appendChild(s)}));
+async function readQrImage(file){
+ const msg=$('#qrMsg');msg.textContent='Lendo o QR Code…';
+ try{const bmp=await createImageBitmap(file);let txt=null;
+  if('BarcodeDetector' in window){try{const r=await new BarcodeDetector({formats:['qr_code']}).detect(bmp);if(r[0])txt=r[0].rawValue}catch(e){}}
+  if(!txt){const jsQR=await loadJsQR();const sc=Math.min(1,1600/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+   const x=c.getContext('2d');x.drawImage(bmp,0,0,c.width,c.height);const d=x.getImageData(0,0,c.width,c.height);const r=jsQR(d.data,c.width,c.height);if(r)txt=r.data}
+  if(!txt){msg.textContent='Não achei um QR Code na foto. Tente mais de perto, com boa luz.';return}
+  parseNota(txt);
+ }catch(e){msg.textContent='Não consegui ler a imagem. Você pode colar o link do QR Code.'}
+}
+function parseNota(txt){
+ const m=String(txt).replace(/\s/g,'').match(/\d{44}/);
+ if(!m){$('#qrMsg').textContent='Esse código não parece de uma nota fiscal (falta a chave de 44 dígitos).';return}
+ const k=m[0],uf=UF[+k.slice(0,2)]||'?',mod=k.slice(20,22),cnpj=k.slice(6,20).replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,'$1.$2.$3/$4-$5');
+ const when=k.slice(4,6)+'/20'+k.slice(2,4),link=/^https:\/\//i.test(txt)?txt:null;
+ const L=plan?plan.res.items:(fam?fam.items:[]),est=L.reduce((s,i)=>s+i.cost,0);
+ openSheet(`<h1>Registrar compra</h1>
+ <dl class="nf"><dt>Nota</dt><dd>${mod==='65'?'NFC-e (cupom)':mod==='55'?'NF-e':'modelo '+esc(mod)}, ${esc(uf)}, ${esc(when)}</dd><dt>CNPJ da loja</dt><dd>${esc(cnpj)}</dd><dt>Chave</dt><dd>${esc(k.replace(/(\d{4})/g,'$1 ').trim())}</dd></dl>
+ ${link?`<p><a href="${esc(link)}" target="_blank" rel="noopener">Abrir a nota no site da Sefaz</a> para conferir os itens.</p>`:''}
+ <p class="card tip">No app final, um servidor busca os itens da nota na Sefaz automaticamente. Neste protótipo, digite o total e, se quiser, o que pagou em cada item.</p>
+ <label class="l" for="nfTot">Total pago</label><div class="money"><span>R$</span><input id="nfTot" type="number" inputmode="decimal" step="0.01" min="0" placeholder="${est?est.toFixed(2):''}"></div>
+ ${L.length?`<h2 style="margin-top:16px">Quanto pagou em cada item (opcional)</h2>${L.map(i=>`<div class="pr"><span class="d">${esc(IT[i.id].n)}<small>${esc(i.desc)} · estimado ${R$(i.cost)}</small></span><input type="number" inputmode="decimal" step="0.01" min="0" data-nf="${esc(i.id)}" data-est="${i.cost}" aria-label="Valor pago em ${esc(IT[i.id].n)}"></div>`).join('')}`:''}
+ <button class="btn" id="nfSave" style="margin-top:14px">Salvar compra</button>`);
+ $('#nfSave').onclick=()=>{
+  const tot=parseFloat($('#nfTot').value);if(!(tot>0)){$('#nfTot').focus();return}
+  const obs=ls.get('cesta.obs',{});let n=0;
+  document.querySelectorAll('[data-nf]').forEach(inp=>{const v=parseFloat(inp.value),e=+inp.dataset.est;if(v>0&&e>0){(obs[inp.dataset.nf]=obs[inp.dataset.nf]||[]).push(+(v/e).toFixed(3));n++}});
+  ls.set('cesta.obs',obs);applyPrices();
+  if(!ls.get('cesta.hist',[]).some(x=>x.k===k))ls.set('cesta.pts',ls.get('cesta.pts',0)+50+5*n);
+  const h=ls.get('cesta.hist',[]);if(!h.some(x=>x.k===k))h.unshift({k,at:Date.now(),tot,est:+est.toFixed(2),cnpj,uf,n});ls.set('cesta.hist',h.slice(0,24));
+  closeOv();if(plan)run(false,true);else renderList();show('list');
+ };
+}
+function points(){const p=ls.get('cesta.pts',0),lv=[[0,'Iniciante'],[100,'Olho no preço'],[300,'Caçador de ofertas'],[800,'Mestre da feira']],cur=lv.filter(l=>p>=l[0]).pop(),nx=lv.find(l=>l[0]>p);
+ return`<div class="card tip" style="margin:12px 0 0"><b>${p} pontos · ${cur[1]}</b><p class="hint" style="margin:4px 0 0">Cada nota vale 50 pontos e cada preço que você confirma vale mais 5, porque ajuda a média de preços da sua região.${nx?` Faltam ${nx[0]-p} para “${nx[1]}”.`:''} Prêmios a definir (ideia: receitas exclusivas ou cupons de parceiros).</p></div>`}
+function history(){const h=ls.get('cesta.hist',[]);if(!h.length)return'';
+ return`<div class="card"><h2>Suas compras</h2>${h.map(x=>{const d=new Date(x.at),df=x.tot-x.est;return`<div class="pr"><span class="d">${d.getDate()}/${d.getMonth()+1} · loja ${esc(x.cnpj)}<small>estimado ${R$(x.est)} · ${df>=0?R$(df)+' acima':R$(-df)+' abaixo'}${x.n?' · '+x.n+' preços ajustados':''}</small></span><b>${R$(x.tot)}</b></div>`}).join('')}</div>`}
+
+// ---------- preços ----------
+function renderPrices(){
+ const o=ls.get('cesta.precos',{});
+ $('#plist').innerHTML=CATS.map(c=>`<div class="card"><h2>${c}</h2>${Object.values(IT).filter(i=>i.cat===c).map(i=>i.packs.map((pk,k)=>`<div class="pr"><span class="d">${esc(i.n)} <span class="src ${i.adj?'n':i.rsrc==='e'?'e':''}">${i.adj?'pelo que você pagou':i.rsrc==='d'?'pesquisado (Fortaleza)':i.rsrc==='p'?'pesquisado (SP)':'estimativa'}</span><small>${i.step?'preço por kg, a granel':esc(pk.l)}${o[i.id]&&o[i.id][k]!=null?' · alterado por você':''}</small></span><input type="number" inputmode="decimal" step="0.01" min="0" value="${pk.p.toFixed(2)}" data-id="${i.id}" data-k="${k}" aria-label="Preço de ${esc(i.n)} ${esc(pk.l)}"></div>`).join('')).join('')}</div>`).join('');
+ $('#plist').querySelectorAll('input').forEach(inp=>inp.onchange=()=>{const v=parseFloat(inp.value);if(!(v>0))return;const o=ls.get('cesta.precos',{});(o[inp.dataset.id]=o[inp.dataset.id]||[])[+inp.dataset.k]=v;ls.set('cesta.precos',o);applyPrices();if(plan)run(false,true);renderPrices()});
+}
+$('#resetP').onclick=()=>{ls.set('cesta.precos',{});ls.set('cesta.obs',{});applyPrices();if(plan)run(false,true);renderPrices()};
+
+function run(go=true,quiet=false){
+ st.budget=Math.max(0,+$('#budget').value||0);save();
+ const p=build();
+ if(p.error){$('#v-menu').innerHTML=`<h1>Seu cardápio</h1><div class="card warn">${esc(p.error)}</div>`;plan=null;document.querySelector('nav [data-v=menu]').disabled=false;show('menu');return}
+ plan=finalize(p);plan.toast=null;if(!quiet){checked=new Set();ls.set('cesta.check',[]);cart={};ls.set('cesta.cart',{});listMode='mine'}
+ document.querySelectorAll('nav button').forEach(b=>b.disabled=false);
+ renderMenu();if(go)show('menu');else if(view==='list')renderList();
+}
+renderForm();
+}
+</script>
+</body>
+</html>
