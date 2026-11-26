@@ -20,7 +20,8 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "package": "br.cesta.planejador"
+      "package": "br.cesta.planejador",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"

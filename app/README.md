@@ -51,3 +51,9 @@ app/
 ## Publicar nas lojas (depois)
 
 Quando for a hora, o [EAS Build](https://docs.expo.dev/build/introduction/) gera o `.apk`/`.aab` (Android) e o `.ipa` (iPhone) na nuvem, sem precisar de Android Studio ou Xcode. Publicar exige conta de desenvolvedor no Google Play (US$ 25, uma vez) e na Apple (US$ 99 por ano).
+
+## Instalador Android (APK)
+
+A cada mudança na pasta `app/`, o GitHub Actions gera um `.apk` (workflow `.github/workflows/android-apk.yml`). Para baixar: aba **Actions** do repositório → execução mais recente de "APK Android" → **Artifacts** → `cesta-apk`. Também dá para rodar à mão em Actions → APK Android → **Run workflow**.
+
+Para instalar, abra o `.apk` no celular e permita "instalar apps desta fonte" quando o Android pedir. O APK é assinado com a chave de teste do Android: serve para testes, não para a Play Store.
