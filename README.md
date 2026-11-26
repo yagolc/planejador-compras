@@ -8,7 +8,7 @@ Você diz quanto pode gastar, quantas pessoas comem em casa e por quanto tempo. 
 
 ![Status](https://img.shields.io/badge/status-protótipo-orange)
 ![Plataformas](https://img.shields.io/badge/plataformas-Android%20%7C%20iOS-blue)
-![Feito com](https://img.shields.io/badge/protótipo-HTML%20%2B%20JS-yellow)
+![Feito com](https://img.shields.io/badge/app-Expo%20%2F%20React%20Native-yellow)
 ![Idioma](https://img.shields.io/badge/idioma-pt--BR-green)
 ![Licença](https://img.shields.io/badge/licença-todos%20os%20direitos%20reservados-lightgrey)
 
@@ -71,7 +71,11 @@ O objetivo final é um app para **Android e iPhone**. Este repositório guarda, 
 
 ## Como testar
 
-### No computador
+### App nativo (Android e iPhone)
+
+Instale o **Expo Go** no celular, rode `cd app && npm install && npx expo start` no computador e leia o QR Code que aparece. Passo a passo em [`app/README.md`](app/README.md).
+
+### Protótipo web no computador
 
 Não há instalação nem build. Basta abrir o arquivo no navegador:
 
@@ -81,7 +85,7 @@ cd planejador-compras
 # abra prototipo/index.html no navegador (duplo clique funciona)
 ```
 
-### No celular
+### Protótipo web no celular
 
 **Opção 1: versão publicada (recomendada).** Abra o link do protótipo publicado no Claude no navegador do celular. É a única forma em que a lista compartilhada da família funciona, porque ela usa o armazenamento do Claude.
 
@@ -100,6 +104,7 @@ Descubra o IP do computador (ex.: `192.168.0.10`) e abra `http://192.168.0.10:30
 
 ```
 planejador-compras/
+├── app/                      # App nativo Android e iPhone (Expo / React Native), ver app/README.md
 ├── prototipo/
 │   └── index.html            # Protótipo web completo (HTML, CSS e JS em um único arquivo)
 ├── precos/
@@ -134,7 +139,7 @@ planejador-compras/
 - [x] Tabela de preços médios v1
 - [x] Cardápio, receitas, lista por corredor e carrinho ao vivo
 - [x] Tabela nutricional e meta de proteína
-- [ ] App nativo para Android e iPhone (Expo / React Native) na pasta `app/`
+- [x] App nativo para Android e iPhone (Expo / React Native) na pasta `app/`
 - [ ] Backend para sincronizar a lista da família e ler os itens da nota fiscal
 - [ ] Atualização mensal automática dos preços
 - [ ] Ofertas da semana dos mercados próximos

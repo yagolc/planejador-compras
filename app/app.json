@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "Cesta",
+    "slug": "cesta-planejador",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "br.cesta.planejador",
+      "infoPlist": {
+        "NSCameraUsageDescription": "A câmera lê o QR Code da nota fiscal para registrar quanto você gastou."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#17583a",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "br.cesta.planejador",
+      "versionCode": 1
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "cesta",
+    "backgroundColor": "#f6f4ee",
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "A câmera lê o QR Code da nota fiscal para registrar quanto você gastou.",
+          "recordAudioAndroid": false
+        }
+      ]
+    ]
+  }
+}
