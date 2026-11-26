@@ -54,6 +54,6 @@ Quando for a hora, o [EAS Build](https://docs.expo.dev/build/introduction/) gera
 
 ## Instalador Android (APK)
 
-A cada mudança na pasta `app/`, o GitHub Actions gera um `.apk` (workflow `.github/workflows/android-apk.yml`). Para baixar: aba **Actions** do repositório → execução mais recente de "APK Android" → **Artifacts** → `cesta-apk`. Também dá para rodar à mão em Actions → APK Android → **Run workflow**.
+A cada mudança na pasta `app/`, o GitHub Actions gera um `.apk` (workflow `.github/workflows/android-apk.yml`). O jeito mais fácil de baixar é pela página **Releases** do repositório (versão "Cesta para Android (versão de teste)", arquivo `Cesta.apk`), aberta direto no navegador do celular. Ele também fica na aba **Actions** do repositório → execução mais recente de "APK Android" → **Artifacts** → `cesta-apk`. Também dá para rodar à mão em Actions → APK Android → **Run workflow**.
 
 Para instalar, abra o `.apk` no celular e permita "instalar apps desta fonte" quando o Android pedir. O APK é assinado com a chave de teste do Android: serve para testes, não para a Play Store.

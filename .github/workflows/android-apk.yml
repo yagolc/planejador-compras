@@ -6,6 +6,9 @@ on:
     paths: ['app/**', '.github/workflows/android-apk.yml']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -39,3 +42,12 @@ jobs:
           name: cesta-apk
           path: app/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
+      - name: Publicar na página de Releases (para baixar direto no celular)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk Cesta.apk
+          gh release delete apk-teste --yes --cleanup-tag || true
+          gh release create apk-teste Cesta.apk --prerelease --target "$GITHUB_SHA" \
+            --title "Cesta para Android (versão de teste)" \
+            --notes "APK gerado automaticamente a partir do branch ${GITHUB_REF_NAME} (commit ${GITHUB_SHA::7}). Baixe o Cesta.apk no celular Android e abra para instalar."
